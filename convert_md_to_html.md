@@ -1,5 +1,5 @@
 ## convert markdown files into html files that are nicer to read
 
-If you don't have it, install `npm` via `brew install npm`. Then install *markdown_to_html* like `npm install markdown-to-html -g`.
+Use *pandoc*. Install with `brew install pandoc`. Then use something like `pandoc convert_md_to_html.md -s -c buttondown.css --self-contained -o foo.html`. This will style the resulting html file with the stylings provided in the provided `.css` file.
 
-Then run `github-markdownb myfile.md [options]`.
+
