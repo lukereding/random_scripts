@@ -12,36 +12,37 @@ def draw_rectangle(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
         ix, iy = x, y
+        cv2.circle(frame, (ix,iy), 5, (116,198,122), -1)
 
     elif event == cv2.EVENT_MOUSEMOVE:
         if drawing == True:
-            print "drawing"
-            # cv2.rectangle(frame,(ix,iy),(x,y),(0,255,0), 3)
+            # print "drawing"
+            cv2.rectangle(frame,(ix,iy),(x,y),(98,17,25), 1)
 
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
-        cv2.rectangle(frame, (ix, iy), (x, y), (0, 255, 0), 3)
-        print "ix: {}, iy: {}, x: {}, y: {}".format(ix, iy, x, y)
-        global x_end, y_end
-        x_end, y_end = x, y
+        cv2.rectangle(frame, (ix, iy), (x, y), (98,17,25), 3)
+        global x_end, y_end, x_initial, y_initial
+        x_end, y_end, x_initial, y_initial = x, y, ix, iy
+        print "x_initial: {}, y_initial: {}, x_end: {}, y_end: {}".format(x_initial, y_initial, x_end, y_end)
 
 
 def get_first_frame(filename):
     cap = cv2.VideoCapture(filename)
     try:
         ret, frame = cap.read()
-        # print instructions on the frame
-        # cv2.putText(frame, "draw rectangle and press q when done", (50,50))
-        cap.release()
-        return frame
+        print "dimensions of video: {}".format(frame.shape)
     except:
         sys.exit("problem reading the video file")
-
+    
+    cap.release()
+    return frame
 
 def make_cropped_video(filename, x, y, width, height, output_name):
-    print 'ffmpeg -i {} -filter:v "crop={}:{}:{}:{}" {}'.format(filename, width, height, x, y, output_name)
+    print 'call to ffmpeg:\nffmpeg -i {} -filter:v "crop=w={}:h={}:x={}:y={}" {}'.format(filename, width, height, x, y, output_name)
+    
     subprocess.call(
-        'ffmpeg -i {} -filter:v "crop={}:{}:{}:{}" {}'.format(
+        'ffmpeg -i {} -filter:v "crop=w={}:h={}:x={}:y={}" {}'.format(
             filename, width, height, x, y, output_name),
         shell=True)
 
@@ -69,8 +70,9 @@ if __name__ == "__main__":
 
     cv2.destroyAllWindows()
 
-    w = abs(x_end - ix)
-    h = abs(y_end - iy)
+    w = abs(x_end - x_initial)
+    h = abs(y_end - y_initial)
+    
     print "width: {}\nheight: {}".format(w, h)
     
     # come up with a new output name
@@ -78,7 +80,7 @@ if __name__ == "__main__":
     
     # have ffmpeg crop the video
     try:
-        make_cropped_video(video_name, ix, iy, w, h, name)
+        make_cropped_video(video_name, x_initial, y_initial, w, h, name)
     except:
         sys.exit("problem with subprocess call to ffmpeg")
 
