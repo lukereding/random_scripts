@@ -12,3 +12,8 @@ The script is run like `bash -x convert_htm_to_mobi.sh /path/to/dir/with/htm/fil
 ## `crop_video.py`
 
 Opens the first frame of a video. The user draws a rectangle. The video is cropped to fit the rectangle with a subprocess call to ffmpeg. Run like `python crop_video.py /path/to/video`
+
+## `encode`
+Script I use for encoding videos. I put it in `/usr/local/bin/` so that it can be executed no matter where you are in the machine. Makes an `encoded` folder wherever the raw video is and saves the encoded video with the same name to that folder. It does not delete the old video.
+
+_useage:_ `encode /path/to/video`
