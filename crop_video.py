@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import sys
 import subprocess
+from math import sqrt
 
 # declare some functions:
 

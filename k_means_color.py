@@ -24,5 +24,5 @@ ap.add_argument("-n", "--number_segments", required = False, help = "number of s
 args = vars(ap.parse_args())
 
 image = io.imread(args["image"])
-labels = seg.slic(image, n_segments=args["number_segments"])
+labels = seg.slic(image, n_segments=int(args["number_segments"]))
 io.imsave('out.jpg', mean_color(image, labels))
