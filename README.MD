@@ -17,3 +17,8 @@ Opens the first frame of a video. The user draws a rectangle. The video is cropp
 Script I use for encoding videos. I put it in `/usr/local/bin/` so that it can be executed no matter where you are in the machine. Makes an `encoded` folder wherever the raw video is and saves the encoded video with the same name to that folder. It does not delete the old video.
 
 _useage:_ `encode /path/to/video`
+
+## `video_to_gif.sh`
+Use to convert a video to a gif, which is more portable and is a fail-safe when embedding in powerpoint / keynote presentations. Requires that ffmpeg be installed on your machine. Use it like
+
+`video_to_gif /path/to/video`.
