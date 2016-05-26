@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# script for encoding big, encoded video files
+# it's meant to be used in conjecution with find, like find ~/Documents/chapter1/vary_size_and_courtship/trial_recordings/ -type f -name "*.mp4" -size +10G -exec /path/to/encode.sh {} \;
+# must use the full path to the video file
+
+# usage: encode.sh /path/to/video_file
+
+if [ -z "$1" ]
+  then
+    echo "No argument supplied"
+    exit 1
+fi
+
+FULL_PATH=$1
+VIDEO=`basename $FULL_PATH`
+DIR=`dirname $FULL_PATH`
+LOGFILE='$DIR/encoding_log.log'
+# TWILIO_NUMBER='your twilio number here'
+# TWILIO_ACCOUNT_SID='your SID here'
+# TWILIO_AUTH_TOKEN='your token here'
+# PHONE_NUMBER='your phone number here'
+
+# create a logfile if it doesn't exist
+if [ ! -f LOGFILE ]
+then
+    echo " " > LOGFILE
+fi
+
+# make a separate directory if it doesn't exist
+if [ ! -d "$DIR""/encoded/" ] 
+then
+    mkdir "$DIR""/encoded/"
+fi
+
+ffmpeg -i $1 -vcodec libx264 -crf 23 -preset medium -pix_fmt yuv420p -y $DIR/encoded/$VIDEO
+
+if [ $? -eq 0 ]; then
+  echo "successfully encoded."
+  # send text
+  MESSAGE="$VIDEO encoded without error."
+  else
+      MESSAGE="$VIDEO failed to encode."
+fi
+
+RESPONSE=`curl -fSs -u "$TWILIO_ACCOUNT_SID:$TWILIO_AUTH_TOKEN" \
+  -d "From=$TWILIO_NUMBER" -d "To=$PHONE_NUMBER" -d "Body=$MESSAGE" \
+  "https://api.twilio.com/2010-04-01/Accounts/$TWILIO_ACCOUNT_SID/Messages"`
