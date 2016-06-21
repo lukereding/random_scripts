@@ -22,3 +22,14 @@ _useage:_ `encode /path/to/video`
 Use to convert a video to a gif, which is more portable and is a fail-safe when embedding in powerpoint / keynote presentations. Requires that ffmpeg be installed on your machine. Use it like
 
 `video_to_gif /path/to/video`.
+
+## `k_means_video.py`
+Apply k-means clustering based on color to the frames of a video. Used like `python k_means_video.py -n input_video.mp4 -n 6` where `-n` is the number of groups to use for clustering.
+
+## `unix_tips_and_tricks.md`
+
+A work in progress.
+
+## `mod_time.py`
+
+Get the difference between when a file was created and when it was last modified. Useful when making sure videos are the length you think they are. Used like `python mod_time.py -i /path/to/dir`.
