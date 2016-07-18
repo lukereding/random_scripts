@@ -2,11 +2,11 @@
 
 PATH="$1"
 
-for file in $PATH*.epub
+for file in $PATH*.htm
 do
     printf "processing $file"
     # get filename without extension
-    f=${file%.epub}
+    f=${file%.htm}
     f_=${f##*/}
     printf $f_
     # do the conversion
