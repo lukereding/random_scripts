@@ -33,3 +33,14 @@ A work in progress.
 ## `mod_time.py`
 
 Get the difference between when a file was created and when it was last modified. Useful when making sure videos are the length you think they are. Used like `python mod_time.py -i /path/to/dir`.
+
+## overlay_boxes.py
+
+Written for Kelly to overlap various boxes on a video.
+
+This script take two inputs: a video and a csv file. The csv file contains the boundaries of different boxes to draw on the frames of each video.
+The csv file should have one column and four rows for each box. The first row contains the upper-left x coordinate of the box, the second the upper-left y coordinate, the third the lower-right x coordinate, and the fourth the lower-right y coordinate.
+
+The script outputs one thing: a video identical to the input video but with the boxes overlaid. Saves as whatever the input name was appended with _overlaid_boxes. For example, _video_a.mp4_ will be saved as _video_a_overlaid_boxes.mp4_.
+
+Run like: `python overlay_boxes.py -i /path/to/video.mp4 -b boxes.csv`
