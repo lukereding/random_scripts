@@ -412,6 +412,15 @@ longFlights %>% spread(key=dest,value=distance)
 
 
 
+####################
+## purrr ##########
+###################
+
+seq(0,20) %>% 
+map(prop.test, n = 20, p=0.5) %>% 
+map_dbl("p.value") %>% 
+plot(0:20, ., xlab= "number successes", ylab="p value", type = "l") + 
+abline(0.05, 0, lty=2)
 
 
 
