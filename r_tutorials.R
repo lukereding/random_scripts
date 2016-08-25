@@ -1,3 +1,87 @@
+#### using tidyr, purrr
+
+require(gapminder)
+require(tidyr)
+require(dplyr)
+require(magrittr)
+require(broom)
+require(ggplot2)
+
+gapminder %<>% mutate(year1950 = year - 1950)
+
+by_country <- gapminder %>%
+  group_by(continent, country) %>%
+  nest
+
+country_model <- function(df){
+  lm(lifeExp ~ year1950, data = df)
+}
+
+models <- by_country %>%
+  mutate(
+    mod = map(data, country_model)
+  )
+
+models %>% filter(continent == "Africa")
+
+# use broom to extract interesting things
+models %<>%
+  mutate(
+    tidy = map(mod, broom::tidy),
+    glance = map(mod, broom::glance),
+    augment = map(mod, broom::augment),
+    rsq = glance %>% map_dbl("r.squared")
+  )
+
+models %>%
+  ggplot(aes(rsq)) +
+  geom_histogram()
+
+models %>% 
+  ggplot(aes(rsq, reorder(country, rsq))) +
+  geom_point(aes(color = continent))
+
+
+unnest(models, data) # back to where we started
+unnest(models, glance, .drop = TRUE) %>% View # shit that's cool
+unnest(model, glance)
+
+models %>%
+  unnest(tidy) %>%
+  select(continent, country, term, estimate, rsq) %>%
+  spread(term, estimate) %>%
+  ggplot(aes(`(Intercept)`, year1950)) +
+  geom_point(aes(color = continent, size = rsq)) +
+  geom_smooth(se = FALSE) +
+  scale_size_area()
+
+
+#### purrr aside
+map_dbl(mtcars, mean)
+funs <- list(mean, median, sd)
+funs %>%
+  map(~ mtcars %>% map_dbl(.x))
+#####
+
+
+##################################
+
+### using igraph
+# see http://kateto.net/networks-r-igraph
+
+g3 <- graph( c("small", "intermediate", "intermediate", "large", "large", "small"), directed = TRUE)
+?igraph.plotting
+plot(g3, vertex.label.color="black", vertex.frame.color="gray", vertex.label.cex=1.2, vertex.label.dist=1.5)
+E(g3)$weight <- c(0.55, 0.5, 0.8)
+require(viridis)
+E(g3)$width <-10^E(g3)$weight
+plot(g3, edge.color = rev(viridis(50))[(E(g3)$weight*100) - 49], vertex.shape="none")
+
+
+
+
+
+#######################################
 ########### data.table tutorial ###########
 ################################################
 #######################################################
@@ -185,15 +269,6 @@ pew[,sum(count),by=income]
 
 # most populous religions:
 pew[,sum(count),by=religion] %>% arrange(desc(V1))
-
-
-
-
-
-
-
-
-
 
 
 
