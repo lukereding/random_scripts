@@ -1,0 +1,28 @@
+# color and fill scale for ggplot2
+
+
+
+palette_base <- function(n, random_order = FALSE) {
+  
+  cols <- c("#ac4142",
+            "#d28445",
+            "#f4bf75",
+            "#90a959",
+            "#75b5aa",
+            "#6a9fb5",
+            "#aa759f",
+            "#8f5536",
+            "black")
+  cols <- cols[c(1,6,5,2,7,4,8,3)]
+  
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_base<- function(...) discrete_scale("colour", "base", palette_base, ...)
+scale_fill_base <- function(...) discrete_scale("fill", "base", palette_base, ...)
