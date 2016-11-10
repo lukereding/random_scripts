@@ -77,8 +77,9 @@ require(viridis)
 E(g3)$width <-10^E(g3)$weight
 plot(g3, edge.color = rev(viridis(50))[(E(g3)$weight*100) - 49], vertex.shape="none")
 
-
-
+###
+## ** also check out the ggnetworkmap function in GGally which can be used to plot network items from igraph
+## ** also see ggnet https://briatte.github.io/ggnet/
 
 
 #######################################
