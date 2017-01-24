@@ -1,5 +1,12 @@
 ## source this when starting R to access nice default theme, new color scales
 
+##########
+### theme_mod is a clear theme that is similar to the cowplot theme with larger text
+### `+ add_axes()` is used to add axes to the theme in a ggplot. Width of the line is an optional argument
+### `+ rotate_labels()` is used to rotate the x axis labels if the are too long or if the plot width is too narrow. Takes the angle to rotate as an optional argument
+
+
+
 require(tidyverse)
 require(viridis)
 require(RColorBrewer)
