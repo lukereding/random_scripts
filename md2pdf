@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+FILE="$1"
+BASE=${FILE%.*}
+
+if [ ! ${FILE: -3} == ".md" ]; then
+  echo "not a .md file"
+  exit 1
+fi
+
+echo "~/Desktop/$BASE.pdf"
+
+pandoc --latex-engine=xelatex -f markdown $FILE -o ~/Desktop/$BASE.pdf
+
+if ! [ $? -eq 0 ]; then
+    echo "could not convert to pdf with pandoc. sorry."
+    exit 1
+fi
+
+exit 0

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# see http://caspian.dotconf.net/menu/Software/SendEmail/
+read -sp 'Enter password. ' PASS
+
+sendEmail -o tls=yes -f lukereding@gmail.com -t lukereding@utexas.edu -s smtp.gmail.com:587 -xu lukereding@gmail.com -xp $PASS -u $1 -m $2
