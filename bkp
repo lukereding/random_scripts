@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# script to create tar archive of a directory and compress with bzip2
+
+# make sure there are two arguments
+if [ "$#" -ne 2 ]; then
+    echo $#
+    echo "supply two arguments: the first is the directory to back up, the second is the location to save the resulting tar.bz2 file"
+    exit 1
+fi
+
+# make sure the first argument exists and is a directory
+if ! [ -d "$1" ]; then
+    echo "the first argument either isn't a directory or doesn't exist."
+    exit 2
+fi
+
+# make sure the second argument exists; if not, create it
+if ! [ -d "$2" ]; then
+    echo "$2 doesn't exist."
+    #mkdir $2
+fi
+
+# extract name of folder without absolute path
+FOLDER=`basename "$1"`
+
+# do tar and bzip2 compression at the same time
+tar -cvjf "$2"/"$FOLDER".tar.bz2 "$1"
+
+ # make sure tar worked
+if ! [ $? -eq 0 ]; then
+    echo "tar failed with exit status $?. sorry."
+    exit 3
+fi
+
+# make sure the resulting file exists
+if ! [ -e "$2"/"$FOLDER".tar.bz2 ]; then
+    echo "weird. although tar appeared to work, it didn't save your file in the correct place."
+    exit 4
+fi
+
+echo "file written at "$2"/"$FOLDER".tar.bz2"

@@ -2,6 +2,22 @@
 
 I'm using this repo to keep track of random scripts I write.
 
+## `bkp`
+
+Shell script I use to create compressed archive files for backing up. Used like `bkp /path/to/folder_to_backup destination/`. Uses bzip2.
+
+## `reading_level`
+
+Shell script that uses pandoc, ucto, and readability to calculate readability statistics from a docx or md file. Used like `reading_level some_file.docx`
+
+## `md2pdf`
+
+Shell script that converts markdown files to a pdf using pandoc. Used like `md2pdf some_text.md`. Creates `some_text.pdf` @ `~/Desktop/`. 
+
+## `plotting_functions.R`
+
+A ggplot2 theme I like + some color scales.
+
 ## `convert_htm_to_mobi.sh`    
 I've been disappointed with the ability to download free, old books from [project gutenberg](https://www.gutenberg.org/) and use them on my Kindle. When I download the books as .mobi files, I can't change the font style. When I download them as plain text documents, there's weird line spacing.     
 
@@ -34,7 +50,7 @@ A work in progress.
 
 Get the difference between when a file was created and when it was last modified. Useful when making sure videos are the length you think they are. Used like `python mod_time.py -i /path/to/dir`.
 
-## overlay_boxes.py
+## `overlay_boxes.py`
 
 Written for Kelly to overlap various boxes on a video.
 

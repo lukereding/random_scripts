@@ -1,0 +1,22 @@
+file=$1
+
+if [ ! -f "$file" ]; then
+    echo "file doesn't exist. exiting."
+    exit 1
+fi
+
+extension="${filename##*.}"
+
+# if the document is a docx, convert with pandoc first
+if [ "$extension" == 'docx' ]; then
+    pandoc --from docx -t markdown_github $file | ucto -L en -n -s ' ' $1 | readability
+else
+  ucto -L en -n -s ' ' $file | readability
+fi
+
+if ! [ $? -eq 0 ]; then
+    echo "could not convert to pdf with pandoc. sorry."
+    exit 1
+fi
+
+  exit 0
