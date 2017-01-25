@@ -58,6 +58,7 @@ theme_mod <- function(font_size = 14, font_family = "", line_size = .5, axes = F
 
 # helper functions to change theme options
 add_axes <- function(width = 0.6){theme(axis.line = element_line(colour = "black", size = width))}
+remove_axes <- function(width = 0.6){theme(axis.line =element_blank())}
 rotate_labels <- function(an = 45){theme(axis.text.x = element_text(angle = an, hjust=1))}
 
 
