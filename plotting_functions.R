@@ -31,10 +31,7 @@ theme_mod <- function(font_size = 14, font_family = "", line_size = .5, axes = F
       axis.title.x      = element_text(
         margin = ggplot2::margin(t = small_size / 2, b = small_size / 4)
       ),
-      axis.title.y      = element_text(
-        angle = 90,
-        margin = ggplot2::margin(r = small_size / 2, l = small_size / 4),
-      ),
+      axis.title.y      = element_text(angle = 90,margin = ggplot2::margin(r = small_size / 2, l = small_size / 4)),
       axis.ticks        = element_line(colour = "black", size = line_size),
       # axis.line = ifelse(axes == TRUE, element_line(colour = "black", size = line_size), element_blank()),
       axis.line = element_blank(),
@@ -51,8 +48,7 @@ theme_mod <- function(font_size = 14, font_family = "", line_size = .5, axes = F
       strip.text        = element_text(size = rel(small_rel)),
       strip.background  = element_blank(),
       plot.background   = element_blank(),
-      plot.title        = element_text(size = font_size*1.2,
-                                       hjust = 0)
+      plot.title        = element_text(size = font_size*1.2, hjust = 0)
     )
 }
 
@@ -147,3 +143,107 @@ palette_bright <- function(n, random_order = FALSE) {
 scale_color_bright <- function(...) discrete_scale("colour", "bright", palette_bright, ...)
 scale_fill_bright <- function(...) discrete_scale("fill", "bright", palette_bright, ...)
 
+
+
+
+palette_cb <- function(n, random_order = FALSE) {
+  cols <- c("#44AA99",
+            "#6699CC",
+            "#332288",
+            "#117733",
+            "#88CCEE",
+            "#661100",
+            "#DDCC77",
+            "#999933",
+            "#CC6677",
+            "#AA4466",
+            "#882255",
+            "#AA4499")
+  cols <- cols[c(3,2,5,1,4,6:12)]
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_cb<- function(...) discrete_scale("colour", "cb", palette_cb, ...)
+scale_fill_cb <- function(...) discrete_scale("fill", "cb", palette_cb, ...)
+
+
+# continuous 
+
+g <- c(0.8423298817793848, 0.8737404427964184, 0.7524954030731037,
+       0.7161563289278935, 0.8232880086631527, 0.6542005475652726,
+       0.5815252468131623, 0.7703468311289211, 0.5923205247665932,
+       0.4576142801317438, 0.7057950454122253, 0.5634791991994519,
+       0.35935359003014994, 0.6245622005326175, 0.554154071059354,
+       0.2958858732022419, 0.532095403269888, 0.5458447574597934,
+       0.25744332683867743, 0.42368146872794976, 0.5191691971789514,
+       0.23607359470828057, 0.3125354171874312, 0.4605854787435648,
+       0.21392162678343224, 0.20848424698401846, 0.3660805512579508,
+       0.17250549177124488, 0.11951843162770594, 0.24320155229883056)
+
+greens <- c()
+for(i in seq(1, length(g), by = 3)){
+  greens <- greens %>% c(rgb(g[i], g[1+i], g[2+i]))
+}
+greens <- colorRampPalette(greens)
+scale_color_greens <- function (..., alpha = 1, begin = 0, end = 1, direction = 1) 
+{
+  if (direction == -1) {
+    tmp <- begin
+    begin <- end
+    end <- tmp
+  }
+  scale_color_gradientn(colours = greens(256), ...)
+}
+
+# green / blue
+b <- c(0.21697808798621682, 0.32733564601225013, 0.36941176807179171,
+       0.23442778952760632, 0.45820839330261826, 0.54352941859002213,
+       0.25140587751382315, 0.58554403931486831, 0.7129411866618138,
+       0.32480841754308709, 0.68493145540648814, 0.7899474686267329,
+       0.45066770474895151, 0.75099834881576832, 0.77038576275694604,
+       0.58002308326608998, 0.81890043370863974, 0.75028067616855398)
+gb <- c()
+for(i in seq(1, length(b), by = 3)){
+  gb <- gb %>% c(rgb(b[i], b[1+i], b[2+i]))
+}
+gb <- colorRampPalette(gb)
+# create scale
+scale_color_gb <- function (..., alpha = 1, begin = 0, end = 1, direction = 1) 
+{
+  if (direction == -1) {
+    tmp <- begin
+    begin <- end
+    end <- tmp
+  }
+  scale_color_gradientn(colours = gb(256), ...)
+}
+
+# purples
+p <- c(0.9537199587873054, 0.8839852653958624, 0.8572137883283991,
+       0.903348395924016, 0.7454993373667652, 0.7391619965768441,
+       0.8399541228445281, 0.6129917738874731, 0.6602115774420979,
+       0.7513505093364804, 0.48945565575763195, 0.6018942098123031,
+       0.6294330293285846, 0.3759488961295364, 0.5449881320264003,
+       0.4874367518814018, 0.2815561055972257, 0.4759723295956624,
+       0.326803151203735, 0.1959385410144846, 0.3750675408906117,
+       0.1750865648952205, 0.11840023306916837, 0.24215989137836502)
+purples <- c()
+for(i in seq(1, length(p), by = 3)){
+  purples <- purples %>% c(rgb(p[i], p[1+i], p[2+i]))
+}
+purples <- colorRampPalette(purples)
+scale_color_purples <- function (..., alpha = 1, begin = 0, end = 1, direction = 1) 
+{
+  if (direction == -1) {
+    tmp <- begin
+    begin <- end
+    end <- tmp
+  }
+  scale_color_gradientn(colours = purples(256), ...)
+}
