@@ -13,7 +13,7 @@ require(RColorBrewer)
 
 
 # theme for ggplot
-theme_mod <- function(font_size = 14, font_family = "", line_size = .5, axes = F) {
+theme_mod <- function(font_size = 14, font_family = "", line_size = .5) {
   half_line <- 9
   small_rel <- 0.857
   small_size <- small_rel * font_size
@@ -60,7 +60,49 @@ rotate_labels <- function(an = 45){theme(axis.text.x = element_text(angle = an, 
 
 theme_set(theme_mod())
 
-# color palettes
+
+##################
+# color palettes #####
+#########################
+
+## discrete
+
+palette_ras <- function(n, random_order = FALSE) {
+  cols <- c("#b33f62",
+            "#0c0a3e",
+            "#f9564f",
+            "#7b1e7a",
+            "#f3c677")
+  cols <- cols[c(2,4,1,3,5)]
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_ras <- function(...) discrete_scale("colour", "ras", palette_ras, ...)
+scale_fill_ras <- function(...) discrete_scale("fill", "ras", palette_ras, ...)
+
+palette_powder <- function(n, random_order = FALSE) {
+  cols <- c("#2c0703",
+            "#890620",
+            "#b6465f",
+            "#da9f93",
+            "#ebd4cb")
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_powder <- function(...) discrete_scale("colour", "powder", palette_powder, ...)
+scale_fill_powder <- function(...) discrete_scale("fill", "powder", palette_powder, ...)
 
 
 # base colors
@@ -144,6 +186,16 @@ scale_color_bright <- function(...) discrete_scale("colour", "bright", palette_b
 scale_fill_bright <- function(...) discrete_scale("fill", "bright", palette_bright, ...)
 
 
+palette_blues <- function(n, random_order = FALSE) {
+  cols <- c("#8A0E38", "#1B95CF","#4D4768","#1B827F", "#C80E38", "#1E6496", "#64AA9D")
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  cols[1:n]
+}
+scale_color_blues <- function(...) discrete_scale("colour", "blues", palette_blues, ...)
+scale_fill_blues <- function(...) discrete_scale("fill", "blues", palette_blues, ...)
 
 
 palette_cb <- function(n, random_order = FALSE) {
@@ -173,6 +225,8 @@ scale_color_cb<- function(...) discrete_scale("colour", "cb", palette_cb, ...)
 scale_fill_cb <- function(...) discrete_scale("fill", "cb", palette_cb, ...)
 
 
+
+####################
 # continuous 
 
 g <- c(0.8423298817793848, 0.8737404427964184, 0.7524954030731037,
@@ -247,3 +301,5 @@ scale_color_purples <- function (..., alpha = 1, begin = 0, end = 1, direction =
   }
   scale_color_gradientn(colours = purples(256), ...)
 }
+
+
