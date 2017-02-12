@@ -1,3 +1,44 @@
+
+## making radar plots with ggplot
+## to be used after loading the plotting_functions.R script in this dir
+
+
+# rescale each variable
+mtcars %<>%
+  rownames_to_column( var = "car" ) %>% 
+  mutate_each(funs(scale), -car)
+
+mtcars %>% 
+  sample_n(6) %>%
+  gather(mpg:carb, key = "character", value = "value") %>%
+  arrange(character) %>% # this is key!
+  ggplot(aes(x=character, y=value, group = car, color = car)) +
+  geom_polygon(fill=NA, aes(color = car), size = 1.5) +
+  # geom_polygon(aes(color = car_name), fill = NA, size = 2)+
+  scale_color_blues()+
+  theme(panel.grid.major.x = element_line(), panel.grid.major.y = element_line(color = "grey90")) +
+  coord_radar() +
+  guides(color = guide_legend(ncol=2)) 
+
+
+# or, to fill in the shapes:
+mtcars %>% 
+  sample_n(6) %>%
+  gather(mpg:carb, key = "character", value = "value") %>%
+  arrange(character) %>% # this is key!
+  ggplot(aes(x=character, y=value, group = car, color = car)) +
+  geom_polygon(aes(fill = car), color = NA) +
+  # geom_polygon(aes(color = car_name), fill = NA, size = 2)+
+  scale_fill_blues(guide = F)+
+  theme(panel.grid.major.x = element_line(), panel.grid.major.y = element_line(color = "grey90")) +
+  coord_radar() +
+  facet_wrap(~ car)
+  
+ 
+  
+
+
+
 #### using tidyr, purrr
 
 require(gapminder)
