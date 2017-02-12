@@ -173,6 +173,19 @@ scale_color_dark <- function(...) discrete_scale("colour", "dark", palette_dark,
 scale_fill_dark<- function(...) discrete_scale("fill", "dark", palette_dark, ...)
 
 
+
+palette_brr <- function(n, random_order = FALSE) {
+  # red, lighter purple, raspberry, orange, dark blue, orange,flesh, ice
+  cols <- c("#D84541", "#783D6D", "#B44361", "#4E3759", "#D7D9D6", "#322E41", "#E46B4A", "#D4F2EB")
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  cols[1:n]
+}
+scale_color_brr <- function(...) discrete_scale("colour", "brr", palette_brr, ...)
+scale_fill_brr <- function(...) discrete_scale("fill", "brr", palette_brr, ...)
+
 palette_bright <- function(n, random_order = FALSE) {
   cols <- c("#eec589", "#573a3b","#55bbb1","#3c4a68","#6399b4", "#969696")
   cols <- cols[c(5,4,2,6,1,3)]
@@ -303,3 +316,15 @@ scale_color_purples <- function (..., alpha = 1, begin = 0, end = 1, direction =
 }
 
 
+b <- c("#2A2A38", "#53395C", "#793E6E", "#A24169", "#C24456", "#E34C30", "#E47C61", "#E19F91", "#DAC2BE", "#D8DAD7", "#D2F8EF")
+br <- colorRampPalette(b)
+scale_color_brrr <- function (..., alpha = 1, begin = 0, end = 1, direction = 1) 
+{
+  if (direction == -1) {
+    tmp <- begin
+    begin <- end
+    end <- tmp
+  }
+  scale_color_gradientn(colours = br(256), ...)
+}
+ggthemr::colour_plot(br(12))
