@@ -200,7 +200,9 @@ scale_fill_bright <- function(...) discrete_scale("fill", "bright", palette_brig
 
 
 palette_blues <- function(n, random_order = FALSE) {
-  cols <- c("#8A0E38", "#1B95CF","#4D4768","#1B827F", "#C80E38", "#1E6496", "#64AA9D")
+  # cols <- c("#8A0E38", "#1B95CF","#4D4768","#1B827F", "#C80E38", "#1E6496", "#64AA9D")
+  cols <- c("#8A0E38", "#52B3D9","#674172","#16A085", "#CF000F", "#34495E", "#65C6BB")
+  cols <- cols[c(6,7,4,1,5,3,2)]
   if (isTRUE(random_order))
     cols <- sample(cols)
   if (length(cols) < n)
@@ -209,7 +211,6 @@ palette_blues <- function(n, random_order = FALSE) {
 }
 scale_color_blues <- function(...) discrete_scale("colour", "blues", palette_blues, ...)
 scale_fill_blues <- function(...) discrete_scale("fill", "blues", palette_blues, ...)
-
 
 palette_cb <- function(n, random_order = FALSE) {
   cols <- c("#44AA99",
