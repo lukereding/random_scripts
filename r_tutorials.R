@@ -1,3 +1,4 @@
+
 ### making surface plots with R
 
 require(fields)
@@ -33,6 +34,18 @@ plot.surface(surface,
              labcex = 1.5,
              ylim = c(-0.05, max(df$y)))
 points(jitter(xy[,1], amount = 0.05), xy[,2], pch = 21, cex = 2, bg = "white", col = "black", lwd = 2)
+
+## similar, but with ggplot:
+library(akima)
+fld <- with(mtcars, interp(x = mpg, y = hp, z = wt))
+gdat <- interp2xyz(fld, data.frame=TRUE)
+
+ggplot(gdat) + 
+  aes(x = x, y = y, z = z, fill = z) + 
+  geom_tile() + 
+  coord_equal() +
+  scale_fill_distiller(palette="PuOr", na.value="white") + 
+  theme_mod() 
 
 
 
