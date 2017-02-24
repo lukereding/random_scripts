@@ -1,3 +1,42 @@
+### making surface plots with R
+
+require(fields)
+require(viridis)
+require(tidyverse)
+
+df <- expand.grid(1:10,1:10)
+df$z <- rnorm(n = 10*10, 50, sd = 10)
+names(df) <- c("x","y","z")
+df$z <- as.numeric(df$z)
+df$x <- as.numeric(df$x)
+df$y <- as.numeric(df$y)
+
+df <- df %>% sample_n(50)
+
+xy <- na.omit(df)[,2:1]
+z <- na.omit(df)[,3]
+
+surface.fit <- Tps(xy, z, m=3)
+surface <- predictSurface(surface.fit)
+
+plot.surface(surface, 
+             type = "C",
+             xlab = "x", 
+             ylab = "y",
+             zlab = "level",
+             main = "", 
+             bty = 'l',
+             col = plasma(256),
+             cex.axis = 1.5,
+             cex.lab = 1.5,
+             cex.main = 1.5,
+             labcex = 1.5,
+             ylim = c(-0.05, max(df$y)))
+points(jitter(xy[,1], amount = 0.05), xy[,2], pch = 21, cex = 2, bg = "white", col = "black", lwd = 2)
+
+
+
+
 
 ## making radar plots with ggplot
 ## to be used after loading the plotting_functions.R script in this dir
