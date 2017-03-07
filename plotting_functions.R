@@ -48,7 +48,7 @@ theme_mod <- function(font_size = 14, font_family = "", line_size = .5) {
       strip.text        = element_text(size = rel(small_rel)),
       strip.background  = element_blank(),
       plot.background   = element_blank(),
-      plot.title        = element_text(size = font_size*1.2, hjust = 0)
+      plot.title        = element_text(size = font_size*1.2, hjust = 0 )
     )
 }
 
@@ -56,9 +56,9 @@ theme_mod <- function(font_size = 14, font_family = "", line_size = .5) {
 add_axes <- function(width = 0.6){theme(axis.line = element_line(colour = "black", size = width))}
 remove_axes <- function(width = 0.6){theme(axis.line =element_blank())}
 rotate_labels <- function(an = 45){theme(axis.text.x = element_text(angle = an, hjust=1))}
+remove_ticks_x <- function(){theme(axis.ticks.x = element_blank())}
 
-
-theme_set(theme_mod())
+# theme_set(theme_mod())
 
 
 ##################
