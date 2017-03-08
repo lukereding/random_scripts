@@ -105,6 +105,21 @@ scale_color_powder <- function(...) discrete_scale("colour", "powder", palette_p
 scale_fill_powder <- function(...) discrete_scale("fill", "powder", palette_powder, ...)
 
 
+palette_classic <- function(n, random_order = FALSE) {
+  cols <- c("#eaab00", "#004165","#236d01", "#eacb77", "#4686aa", "#65aa46" ,"#ea5d00", "#f29354")
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_classic <- function(...) discrete_scale("colour", "classic", palette_classic, ...)
+scale_fill_classic <- function(...) discrete_scale("fill", "classic", palette_classic, ...)
+
+
 # base colors
 palette_base <- function(n, random_order = FALSE) {
   cols <- c("#ac4142",
