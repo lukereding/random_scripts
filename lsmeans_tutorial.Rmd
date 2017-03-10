@@ -5,10 +5,6 @@ date: "3/10/2017"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 The goal here is to show how to use the `lsmeans` package in R to get the estimated marginal means from a model.
 
 ## What are estimated marginal means?
@@ -132,7 +128,61 @@ data("Oats", package = "nlme")
 
 Oats.lmer2 <- lmer(log(yield) ~ Variety + poly(nitro,2) + (1|Block/Variety),  data = Oats)
 anova(Oats.lmer2)
+
+ggplot(Oats, aes(x = nitro, y = log(yield), color = Variety)) +
+  geom_jitter(height = 0, width = 0.03) +
+  scale_color_classic() +
+  theme_mod() + 
+  add_axes()
+
+## or 
+
+Oats %>%
+  group_by(Variety, nitro) %>%
+  summarise(avg = mean(yield, na.rm = T)) %>%
+  ggplot(aes(factor(nitro), avg, color = Variety, group = Variety)) +
+  geom_line(position = position_dodge(0.3)) +
+  geom_point(position = position_dodge(0.3)) +
+  scale_color_classic() +
+  theme_mod() +
+  add_axes()
+
 ```
+Again, if we want to visualize the average effect of nitrogen on yeild, averaging across varieties and blocks, we can use:
+
+
+```{r}
+(marginal <- lsmeans(Oats.lmer2, "nitro", cov.reduce = FALSE) %>% broom::tidy(.)) %>%
+  ggplot(aes(x = factor(nitro), y = estimate)) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0) +
+  geom_col() +
+  theme_mod()
+  
+## or 
+marginal %>%
+  ggplot(aes(x = factor(nitro), y = estimate)) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0) +
+  geom_point() +
+  theme_mod() +
+  add_axes()
+```
+
+Or, to show the average yeild by variety averaged across blocks:
+
+```{r}
+## or 
+lsmeans(Oats.lmer2, "nitro", by = "Variety", cov.reduce = FALSE) %>%
+  broom::tidy(.) %>%
+  ggplot(aes(nitro, estimate, color = Variety)) +
+  geom_line(position = position_dodge(0.1)) +
+  geom_point(position = position_dodge(0.1)) +
+  geom_errorbar(width = 0, aes(ymin = conf.low, ymax = conf.high), position = position_dodge(0.1)) +
+  scale_color_classic() +
+  theme_mod()
+
+
+```
+
 
 Nitro is a number, but it should really be treated as a factor. We can use `cov.reduce = FALSE` to tell lsmeans to treat numeric variables as factors:
 
