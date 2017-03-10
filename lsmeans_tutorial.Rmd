@@ -1,0 +1,156 @@
+---
+title: "estimated marginal means"
+author: "luke reding"
+date: "3/10/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The goal here is to show how to use the `lsmeans` package in R to get the estimated marginal means from a model.
+
+## What are estimated marginal means?
+
+You have a model, but it's complex. There might be a lot of covariates, or you might have a random effect or two. In these cases it's difficult to simply show the data to show an effect. Instead, you can use estimated marginal means, or covariate-adjusted means. This allows you to show some effect you're interested in independent of the effect that other varaibles in your model have.
+
+## example using a linear model (lm())
+
+Let's use the `oranges` dataset that comes with `lsmeans` to flesh this out.
+
+```{r}
+library("lsmeans")
+oranges.lm1 <- lm(sales1 ~ price1 + price2 + day + store, data = oranges)
+car::Anova(oranges.lm1)
+
+```
+
+Part of what happens with the `lsmeans` package is that a _reference grid_ is established. A reference grid is all the combinations of the factor levels of all the variables in the analysis; any numeric variables only get one level: their mean.
+
+To see what this grid looks like for the `oranges` dataset:
+
+
+```{r}
+
+( oranges.rg1 <- ref.grid(oranges.lm1) )
+summary(oranges.rg1)
+
+
+```
+
+
+The ANOVA showed a significant effect of _day_. Let's compare plotting the actual data to extracting and plotting the estimated marginal means:
+
+```{r}
+
+library(tidyverse)
+library(magrittr)
+source("~/Documents/random_scripts/plotting_functions.R")
+
+ggplot(oranges, aes(y = sales1, x = day)) + 
+  geom_point() + 
+  theme_mod() +
+  add_axes()
+
+```
+
+We can get the estimated marginal means by using:
+
+
+```{r}
+
+(marginal <- lsmeans(oranges.lm1, "day") %>% broom::tidy(.))
+
+
+```
+
+This is the estimated `sales1` for each day averaged over all the variables in our model, `oranges.lm1`. I've also used the `broom` package here to make the output more useable and informatibe.
+
+
+We could now plot these estimated means instead of the raw data:
+
+
+```{r}
+marginal %>%
+  ggplot(aes(x = day, y = estimate)) +
+  geom_col() +
+  geom_errorbar(aes(ymin=estimate-std.error, ymax=estimate+std.error), width = 0) +
+  theme_mod()
+
+## or
+marginal %>%
+  ggplot(aes(x = day, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=estimate-std.error, ymax=estimate+std.error), width = 0) +
+  theme_mod()
+
+```
+
+Here the effect is a bit more clearly seen and is more honest to the underlying statistical analysis used to analyze the data.
+
+## more complicated
+
+We can also do all sorts of stats on these marginal means. For example, in the previous example, we might want to test whether the price estimate on days 1 and 2 is different from the prices on the other days:
+
+
+```{r}
+
+days.lsm <- lsmeans(oranges.lm1, "day")
+( days_contr.lsm <- contrast(days.lsm, "trt.vs.ctrl", ref = c(1,2)) )
+
+```
+As we can see from the plot above, day 4 and, to a lesster degree, day 6 aren't too different from the prices on days 1 and 2, and the results of the code above verify this intuition. 
+
+You can also do something more general and compare all lsmeans to each other.
+
+```{r}
+
+pairs(lsmeans(oranges.lm1, "day"))
+
+```
+
+Again, these p-values verify our intuition about the plot above.
+
+It also might be useful to add letters or numbers to groups that don't differ significantly:
+
+
+```{r}
+
+require(multcompView)
+cld(days.lsm, alpha = .10)
+
+```
+
+## example using a linear mixed model (lmer())
+
+
+```{r}
+
+require("lme4")
+data("Oats", package = "nlme")
+
+Oats.lmer2 <- lmer(log(yield) ~ Variety + poly(nitro,2) + (1|Block/Variety),  data = Oats)
+anova(Oats.lmer2)
+```
+
+Nitro is a number, but it should really be treated as a factor. We can use `cov.reduce = FALSE` to tell lsmeans to treat numeric variables as factors:
+
+
+```{r}
+
+(Oats.lsm2 <- lsmeans(Oats.lmer2, ~ nitro | Variety, cov.reduce = FALSE))
+
+```
+
+
+
+## more info
+
+The vignette for lsmeans (`vignette("using-lsmeans")`) is super useful and a great resource.
+ 
+
+
+
+
+
