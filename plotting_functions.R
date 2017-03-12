@@ -188,6 +188,19 @@ scale_color_dark <- function(...) discrete_scale("colour", "dark", palette_dark,
 scale_fill_dark<- function(...) discrete_scale("fill", "dark", palette_dark, ...)
 
 
+palette_puz <- function(n, random_order = FALSE) {
+  cols <- c("#525164", "#A4C3B1", "#DB868C", "#4A6851", "#714738", "#FBDD93", "#C04839", "#D8924F","#EBA758")
+  cols <- cols[c(1,2,4,5,9,6,3,7,8)]
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  cols[1:n]
+}
+scale_color_puz <- function(...) discrete_scale("colour", "puz", palette_puz, ...)
+scale_fill_puz <- function(...) discrete_scale("fill", "puz", palette_puz, ...)
+
+
 
 palette_brr <- function(n, random_order = FALSE) {
   # red, lighter purple, raspberry, orange, dark blue, orange,flesh, ice
