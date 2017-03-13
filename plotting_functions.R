@@ -163,8 +163,8 @@ scale_color_charted<- function(...) discrete_scale("colour", "charted", palette_
 scale_fill_charted <- function(...) discrete_scale("fill", "charted", palette_charted, ...)
 
 palette_world <- function(n, random_order = FALSE) {
-  cols <- c("#e39d25", "#d16050","#5cb3e7","#4676b1","#818b98","#4c4c4c")
-  cols <- cols[c(3,4,1,2,5,6)]
+  cols <- c("#e39d25", "#d16050","#5cb3e7","#4676b1","#1E824C", "#4DAF7C", "#818b98","#4c4c4c")
+  cols <- cols[c(3,4,1,2,5,6, 7, 8)]
   if (isTRUE(random_order))
     cols <- sample(cols)
   if (length(cols) < n)
@@ -190,7 +190,7 @@ scale_fill_dark<- function(...) discrete_scale("fill", "dark", palette_dark, ...
 
 palette_puz <- function(n, random_order = FALSE) {
   cols <- c("#525164", "#A4C3B1", "#DB868C", "#4A6851", "#714738", "#FBDD93", "#C04839", "#D8924F","#EBA758")
-  cols <- cols[c(1,2,4,5,9,6,3,7,8)]
+  cols <- cols[c(1,4,2,5,9,6,3,7,8)]
   if (isTRUE(random_order))
     cols <- sample(cols)
   if (length(cols) < n)
