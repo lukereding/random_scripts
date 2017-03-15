@@ -202,6 +202,20 @@ scale_fill_puz <- function(...) discrete_scale("fill", "puz", palette_puz, ...)
 
 
 
+palette_brew <- function(n, random_order = FALSE) {
+  cols <- c("#4C9889", "#5E3F27", "#708CB0", "#2A534D", "#FFF55E", "#313752", "#FC6C64", "#FFAF4F", "#88211C")
+  cols <- cols[c(1,4,2,5,9,6,3,7,8)]
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  cols[1:n]
+}
+scale_color_brew <- function(...) discrete_scale("colour", "brew", palette_brew, ...)
+scale_fill_brew <- function(...) discrete_scale("fill", "brew", palette_brew, ...)
+
+
+
 palette_brr <- function(n, random_order = FALSE) {
   # red, lighter purple, raspberry, orange, dark blue, orange,flesh, ice
   cols <- c("#D84541", "#783D6D", "#B44361", "#4E3759", "#D7D9D6", "#322E41", "#E46B4A", "#D4F2EB")
