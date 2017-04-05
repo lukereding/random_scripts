@@ -371,3 +371,14 @@ scale_color_brrr <- function (..., alpha = 1, begin = 0, end = 1, direction = 1)
   scale_color_gradientn(colours = br(256), ...)
 }
 ggthemr::colour_plot(br(12))
+
+coord_radar <- function (theta = "x", start = 0, direction = 1) 
+{
+  theta <- match.arg(theta, c("x", "y"))
+  r <- if (theta == "x") 
+    "y"
+  else "x"
+  ggproto("CordRadar", CoordPolar, theta = theta, r = r, start = start, 
+          direction = sign(direction),
+          is_linear = function(coord) TRUE)
+}
