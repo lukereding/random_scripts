@@ -86,6 +86,21 @@ palette_ras <- function(n, random_order = FALSE) {
 scale_color_ras <- function(...) discrete_scale("colour", "ras", palette_ras, ...)
 scale_fill_ras <- function(...) discrete_scale("fill", "ras", palette_ras, ...)
 
+
+palette_pen <- function(n, random_order = FALSE) {
+  cols <- c("#E84F22","#F2C500", "#37454B", "#82BAC5", "#8B8B8B")
+  cols <- cols[c(3,2,4,1,5)]
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  cols[1:n]
+}
+scale_color_pen <- function(...) discrete_scale("colour", "pen", palette_pen, ...)
+scale_fill_pen <- function(...) discrete_scale("fill", "pen", palette_pen, ...)
+
+
+
 palette_powder <- function(n, random_order = FALSE) {
   cols <- c("#2c0703",
             "#890620",
