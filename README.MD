@@ -2,6 +2,10 @@
 
 I'm using this repo to keep track of random scripts I write.
 
+## `opencv_inside_docker.md`
+
+Short notes on how to run opencv within a docker container. I've verified this works for some short scripts that use opencv. If the opencv build on your machine breaks, this is a good option to use instead.
+
 ## `bkp`
 
 Shell script I use to create compressed archive files for backing up. Used like `bkp /path/to/folder_to_backup destination/`. Uses bzip2.
