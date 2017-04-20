@@ -90,7 +90,7 @@ df.at[dates[0],'A']
 del df['A']
 # or
 df.drop('A', axis = 'columns', inplace = True)
-
+df.drop(['A', 'B'], axis = 1, inplace = True) # same thing
 ```
 
 
@@ -108,6 +108,10 @@ data = pd.DataFrame({'group': ['a', 'a', 'a', 'b','b', 'b', 'c', 'c','c'],
 # sorts values in place, by group and then by ounches within each group, in-place
 data.sort_values(by=['group','ounces'], ascending=[False, True], inplace=True)
 
+## Sort by column indices
+frame = pd.DataFrame({'b': [4, 7, -3, 2], 'a': [0, 1, 0, 1]})
+frame.sort_index(by = 'b')
+frame.sort_index(by=['a', 'b'])
 
 ```
 
@@ -195,6 +199,10 @@ To find where NaN values are use
 
 pd.isnull(df)
 
+pd.notnull(df)
+
+df.isnull()
+
 # also see
 df.isnull().any(axis=1)
 
@@ -231,6 +239,10 @@ df.apply(lambda x: x.max() - x.min())
 
 # get the range for each row
 df.apply(lambda x: x.max() - x.min(), axis = 1)
+
+def f(x):
+	return Series([x.min(), x.max()], index=['min', 'max'])
+df.apply(f)
 
 ```
 
