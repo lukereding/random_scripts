@@ -3,7 +3,21 @@
 [Great resource](http://nbviewer.jupyter.org/github/pybokeh/jupyter_notebooks/blob/master/pandas/PandasCheatSheet.ipynb)
 [using pipes in pandas](http://pandas.pydata.org/pandas-docs/stable/basics.html#tablewise-function-application) (note that pandas calls this _method chaining_)
 
+## __
+
+Similar to select in dplyr is the unfortunately named filter:
+
 ```python
+df.filter(items = ["col1", "col2"])
+```
+
+grabs columns 1 and 2.
+
+Similarly, query is like dplyr's filter:
+
+```python
+
+df.query('col1 < 5')
 
 ```
 
