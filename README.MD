@@ -2,6 +2,12 @@
 
 I'm using this repo to keep track of random scripts I write.
 
+## `nyt.py`
+
+Opens the leading three stories from the nytimes page in your browser. 
+
+Run like: `python3 nyt.py` or `./nyt.py`
+
 ## `opencv_inside_docker.md`
 
 Short notes on how to run opencv within a docker container. I've verified this works for some short scripts that use opencv. If the opencv build on your machine breaks, this is a good option to use instead.
