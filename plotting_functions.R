@@ -135,6 +135,21 @@ scale_color_classic <- function(...) discrete_scale("colour", "classic", palette
 scale_fill_classic <- function(...) discrete_scale("fill", "classic", palette_classic, ...)
 
 
+palette_cool<- function(n, random_order = FALSE) {
+  cols <- c("#1F1B29", "#00D6B1", "#339EFF", "#FFFB39", "#FD4A2E")
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_cool <- function(...) discrete_scale("colour", "cool", palette_cool, ...)
+scale_fill_cool<- function(...) discrete_scale("fill", "cool", palette_cool, ...)
+
+
 # base colors
 palette_base <- function(n, random_order = FALSE) {
   cols <- c("#ac4142",
