@@ -1,6 +1,5 @@
 from fake_useragent import UserAgent
 import requests
-import numpy as np
 import time
 
 '''
@@ -27,7 +26,7 @@ while i < 200:
 
     i += 1
 
-    sleep_sec = int(np.random.randint(30,100,1))
+    sleep_sec = int(random.uniform(5,75))
     time.sleep(sleep_sec)
 
 print("done")
