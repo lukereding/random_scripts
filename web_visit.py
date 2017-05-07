@@ -1,6 +1,7 @@
 from fake_useragent import UserAgent
 import requests
 import time
+from random import uniform
 
 '''
 
@@ -26,7 +27,7 @@ while i < 200:
 
     i += 1
 
-    sleep_sec = int(random.uniform(5,75))
+    sleep_sec = int(uniform(5,75))
     time.sleep(sleep_sec)
 
 print("done")
