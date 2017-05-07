@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from fake_useragent import UserAgent
 import requests
 import time
