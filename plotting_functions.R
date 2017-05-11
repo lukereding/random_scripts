@@ -205,6 +205,18 @@ scale_color_world <- function(...) discrete_scale("colour", "world", palette_wor
 scale_fill_world <- function(...) discrete_scale("fill", "world", palette_world, ...)
 
 
+palette_alpine <- function(n, random_order = FALSE) {
+  cols <- c("#302A5B", "#B93529","#BB6A2C","#6D7897","#5E5A6E", "#4DAF7C", "#421810")
+  if (isTRUE(random_order))
+    cols <- sample(cols)
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  cols[1:n]
+}
+scale_color_alpine <- function(...) discrete_scale("colour", "alpine", palette_alpine, ...)
+scale_fill_alpine <- function(...) discrete_scale("fill", "alpine", palette_alpine, ...)
+
+
 palette_dark <- function(n, random_order = FALSE) {
   cols <- c("#3c2a21", "#a37c26","#a99b92","#1C4C68","#812e2c")
   cols <- cols[c(5,4,2,1,3)]
@@ -400,7 +412,7 @@ scale_color_brrr <- function (..., alpha = 1, begin = 0, end = 1, direction = 1)
   }
   scale_color_gradientn(colours = br(256), ...)
 }
-ggthemr::colour_plot(br(12))
+#ggthemr::colour_plot(br(12))
 
 coord_radar <- function (theta = "x", start = 0, direction = 1) 
 {
