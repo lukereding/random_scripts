@@ -57,7 +57,8 @@ add_axes <- function(width = 0.6){theme(axis.line = element_line(colour = "black
 remove_axes <- function(width = 0.6){theme(axis.line =element_blank())}
 rotate_labels <- function(an = 45){theme(axis.text.x = element_text(angle = an, hjust=1))}
 remove_ticks_x <- function(){theme(axis.ticks.x = element_blank())}
-
+move_ticks_inside_x <- function(){theme(axis.ticks.length=unit(-0.25, "cm"), axis.text.x = element_text(margin=margin(10,5,15,5,"pt")))}
+move_ticks_inside_y <- function(){theme(axis.ticks.length=unit(-0.25, "cm"), axis.text.y = element_text(margin=margin(10,10,15,5,"pt")))}
 # theme_set(theme_mod())
 
 
