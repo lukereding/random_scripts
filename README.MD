@@ -2,6 +2,25 @@
 
 I'm using this repo to keep track of random scripts I write.
 
+## `invert.go`
+
+Go script used to invert png images. Once compiled with `go build invert.go`, use like `invert -i input_image`:
+
+```
+invert_image --help
+Usage of invert_image:
+  -i string
+    	path to the image (default "test.png")
+  -invert_color string
+    	do you only want invert non-grey pixels? default: yes (default "yes")
+  -invert_grey string
+    	do you only want to invert grey pixels? default: yes (default "yes")
+
+```
+
+Creates a png in the current working directory named `out.png`.
+
+
 ## `nyt.py`
 
 Opens the leading three stories from the nytimes page in your browser. 
