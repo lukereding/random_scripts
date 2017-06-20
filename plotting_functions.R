@@ -15,7 +15,7 @@ require(RColorBrewer)
 # theme for ggplot
 theme_mod <- function(font_size = 14, font_family = "", line_size = .5) {
   half_line <- 9
-  small_rel <- 0.857
+  small_rel <- 0.7
   small_size <- small_rel * font_size
   
   theme_grey(base_size = font_size, base_family = font_family) %+replace%
