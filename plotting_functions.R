@@ -53,7 +53,7 @@ theme_mod <- function(font_size = 12, font_family = "", line_size = .5) {
 }
 
 # helper functions to change theme options
-add_axes <- function(width = 0.6){theme(axis.line = element_line(colour = "black", size = width))}
+add_axes <- function(width = 0.4){theme(axis.line = element_line(colour = "black", size = width))}
 remove_axes <- function(width = 0.6){theme(axis.line =element_blank())}
 rotate_labels <- function(an = 45){theme(axis.text.x = element_text(angle = an, hjust=1))}
 remove_ticks_x <- function(){theme(axis.ticks.x = element_blank())}
