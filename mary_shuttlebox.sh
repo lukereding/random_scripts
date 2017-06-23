@@ -41,7 +41,7 @@ ffmpeg -f concat -i conCatFile1 -y final1.mp4 &
 echo concatenating video 2
 
 echo "file 'empty_300_s.mp4'" > conCatFile2
-for i in {1..15}; do printf "file '%s'\n" "empty_111_s.mp4" >> conCatFile2; printf "file '%s'\n" "black_1_s.mp4" >> conCatFile2; printf "file '%s'\n" "shoal.mp4" >> conCatFile1; >> conCatFile2; done
+for i in {1..15}; do printf "file '%s'\n" "empty_111_s.mp4" >> conCatFile2; printf "file '%s'\n" "black_1_s.mp4" >> conCatFile2; printf "file '%s'\n" "shoal.mp4" >> conCatFile2; >> conCatFile2; done
 ffmpeg -f concat -i conCatFile2 -y final2.mp4 &
 
 wait %1 %2
