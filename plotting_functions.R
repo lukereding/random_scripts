@@ -46,7 +46,7 @@ theme_mod <- function(font_size = 12, font_family = "", line_size = .5) {
       panel.grid.major  = element_blank(),
       panel.grid.minor  = element_blank(),
       strip.text        = element_text(size = rel(small_rel)),
-      strip.background  = element_blank(),
+      strip.background = element_rect(colour="red", fill="#878787"),
       plot.background   = element_blank(),
       plot.title        = element_text(size = font_size*1.2, hjust = 0 )
     )
