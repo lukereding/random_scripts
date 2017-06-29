@@ -61,6 +61,70 @@ move_ticks_inside_x <- function(){theme(axis.ticks.length=unit(-0.25, "cm"), axi
 move_ticks_inside_y <- function(){theme(axis.ticks.length=unit(-0.25, "cm"), axis.text.y = element_text(margin=margin(10,10,15,5,"pt")))}
 # theme_set(theme_mod())
 
+## add themes from https://github.com/kassambara/ggpubr/blob/master/R/theme_pubr.R
+theme_pubr <- function (base_size = 12, base_family = "",
+                        border = FALSE, margin = TRUE,
+                        legend = c("top", "bottom", "left", "right", "none"),
+                        x.text.angle = 0)
+{
+  half_line <- base_size/2
+  if(!is.numeric(legend)) legend <- match.arg(legend)
+  if(x.text.angle > 5) xhjust <- 1 else xhjust <- NULL
+
+  if(border){
+    panel.border <- element_rect(fill = NA, colour = "black", size = 0.7)
+    axis.line <- element_blank()
+  }
+  else{
+    panel.border <- element_blank()
+    axis.line = element_line(colour = "black", size = 0.5)
+  }
+
+
+  if(margin)
+    plot.margin <- margin(half_line, half_line, half_line,
+                          half_line)
+  else plot.margin <- unit(c(0.5,0.3,0.3,0.3),"mm")
+
+  .theme <- theme_bw(base_size = base_size, base_family = base_family) %+replace%
+    theme(panel.border = panel.border,
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.line = axis.line, axis.text = element_text(color = "black"),
+          legend.key = element_blank(),
+          strip.background = element_rect(fill = "#F2F2F2", colour = "black", size = 0.7),
+          plot.margin = plot.margin,
+          legend.position = legend,
+          complete = TRUE)
+
+  if(x.text.angle!=0)
+    .theme <- .theme + theme(axis.text.x = element_text(angle = x.text.angle, hjust = xhjust))
+
+  .theme
+}
+
+
+labs_pubr <- function(base_size = 14, base_family = ""){
+  theme(
+    text = element_text(family = base_family,
+                        face = "plain", colour = "black", size = base_size, lineheight = 0.9,
+                        hjust = 0.5, vjust = 0.5, angle = 0, margin = margin(),
+                        debug = FALSE),
+    # Tick labels
+    axis.text.x = element_text(size = rel(0.86), colour = "black", face = "bold"),
+    axis.text.y = element_text(size = rel(0.86), colour = "black", face = "bold"),
+
+    # Axis labels
+    axis.title = element_text(size = rel(1), colour = "black", face = "bold"),
+
+    # Main title
+    plot.title = element_text(size = rel(1), colour = "black" ,
+                              lineheight=1.0, face = "bold"),
+    legend.title = element_text(size = rel(0.7), face = "bold", colour = "black"),
+    legend.text = element_text(size = rel(0.7), face = "plain", colour = "black")
+  )
+}
+
 
 ##################
 # color palettes #####
