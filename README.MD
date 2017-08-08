@@ -2,6 +2,25 @@
 
 I'm using this repo to keep track of random scripts I write.
 
+## `crop.go`
+
+Go script used to crop photos. Useful for cropping multiple photos in the same place. Used like:
+
+```bash
+crop -i /path/to/image.jpg -w 200 -h 200 -x 0 -h 0
+```
+
+where:
+
+> w: width of cropped image      
+h: height of cropped image       
+x: x-coordinate in the original image to start with       
+y: y-coordinate in the original image to start with    
+i: input image to use
+
+Not optimized for piping, but `parallel` or `find` work fine. Saves the cropped photo in the same directory of the photo: `photo.1.jpg` becomes `photo.1_cropped.jpg`.
+
+
 ## `invert.go`
 
 Go script used to invert png images. Once compiled with `go build invert.go`, use like `invert -i input_image`:
