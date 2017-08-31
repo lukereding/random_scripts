@@ -132,6 +132,21 @@ labs_pubr <- function(base_size = 14, base_family = ""){
 
 ## discrete
 
+
+palette_lr <- function(n) {
+  cols <- c("#FFBC00", "#FF7B35", "#FF5555", "#C55981", "#8E6DA2", "#525D6B", "#2E3838", "grey50")
+  cols <- cols[c(3,6,2,7,4,1,8,5)]
+  
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_lr <- function(...) discrete_scale("colour", "lr", palette_lr, ...)
+scale_fill_lr <- function(...) discrete_scale("fill", "lr", palette_lr, ...)
+
+
 palette_ras <- function(n, random_order = FALSE) {
   cols <- c("#b33f62",
             "#0c0a3e",
@@ -153,8 +168,9 @@ scale_fill_ras <- function(...) discrete_scale("fill", "ras", palette_ras, ...)
 
 
 palette_pen <- function(n, random_order = FALSE) {
-  cols <- c("#E84F22","#F2C500", "#37454B", "#82BAC5", "#8B8B8B")
-  cols <- cols[c(3,2,4,1,5)]
+  cols <- c("#E84F22","#F2C500", "#37454B", "#82BAC5", "#8B8B8B", "#d36f6f")
+  # cols <- cols[c(3,2,4,1,5)]
+  cols <- cols[c(1,4,3,2,5, 6)]
   if (isTRUE(random_order))
     cols <- sample(cols)
   if (length(cols) < n)
@@ -259,7 +275,7 @@ scale_fill_charted <- function(...) discrete_scale("fill", "charted", palette_ch
 
 palette_world <- function(n, random_order = FALSE) {
   cols <- c("#e39d25", "#d16050","#5cb3e7","#4676b1","#1E824C", "#4DAF7C", "#818b98","#4c4c4c")
-  cols <- cols[c(3,4,1,2,5,6, 7, 8)]
+  cols <- cols[c(2,3,8,1,4,7,6, 5)]
   if (isTRUE(random_order))
     cols <- sample(cols)
   if (length(cols) < n)
