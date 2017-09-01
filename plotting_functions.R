@@ -132,6 +132,20 @@ labs_pubr <- function(base_size = 14, base_family = ""){
 
 ## discrete
 
+palette_pt <- function(n) {
+  cols <- c("#44AAAA", "#AA4455", "#4477AA", "#AA4488", "#44AA77", "#AA7744", "#AAAA44")
+
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_pt <- function(...) discrete_scale("colour", "pt", palette_pt, ...)
+scale_fill_pt <- function(...) discrete_scale("fill", "pt", palette_pt, ...)
+
+
+
 
 palette_lr <- function(n) {
   cols <- c("#FFBC00", "#FF7B35", "#FF5555", "#C55981", "#8E6DA2", "#525D6B", "#2E3838", "grey50")
