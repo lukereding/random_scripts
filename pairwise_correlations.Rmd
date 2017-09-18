@@ -1,0 +1,105 @@
+---
+title: "R Notebook"
+output:
+  html_notebook:
+    fig_height: 8
+    fig_width: 8
+    highlight: tango
+    theme: journal
+    toc: yes
+  html_document:
+    toc: yes
+---
+
+Very basic attempt to figure out, given a dataframe with a lot of variables, how to find potentially significant relationships between pairs of variables.
+
+I first use the `wakefeild` package to generate some simulated data. I also load the `tidyverse` (contains `ggplot2`, `dplyr`, etc.) and `magrittr` packages:
+
+```{r}
+library(wakefield)
+library(tidyverse)
+library(magrittr)
+
+# generate dataframe with fake data
+set.seed(11)
+df <- r_data_frame(
+    n = 100,
+    id,
+    Scoring = rnorm,
+    race,
+    age,
+    sex,
+    iq,
+    height,
+    dice,
+    hair
+)
+
+df %>% sample_n(10)
+  
+```
+
+Actually, to keep things simple, let's only take the numeric variables:
+
+```{r}
+
+df %<>% select_if(is.numeric)
+
+# check to make sure
+map(df, is.numeric)
+
+```
+
+Let's create a new dataframe where we calculate the correlation between each pair of variables. 
+
+Note that I'm using two calls to `map` here which is like use `apply` instead of nested `for` loops. I'm also using `broom::glance` which takes a model output and creates a dataframe out of it:
+
+```{r}
+library(broom)
+
+# Function that returns a dataframe of the correlation test between xth and all subsequent columns of dataframe `df`
+get_stats <- function(x){
+  (x+1):ncol(df) %>% 
+    map(~ cor.test(pull(df[,x]), pull(df[,.x]), use="pairwise.complete.obs") %>%
+    glance %>%
+    mutate(variable_1 = names(df[,x]),
+           variable_2 = names(df[,.x]))) %>%
+      reduce(bind_rows)
+}
+
+# make results dataframe that contains the results of all the `cor.test`s
+results <- 1:(ncol(df)-1) %>% 
+  map(get_stats) %>% 
+  reduce(bind_rows)
+
+
+# check to make sure there are 'ncol(df) choose 2' rows in `results`
+choose(ncol(df), 2) == nrow(results)
+
+```
+
+Sort the results by the correlation coefficient:
+
+```{r}
+
+results %>% 
+  arrange(desc(estimate))
+
+```
+
+Better, plot it:
+
+```{r}
+require(ggpubr)
+
+results %>%
+  unite(combo, variable_1, variable_2, sep = "*") %>%
+  ggplot(aes(x = reorder(combo, desc(estimate)), y = estimate)) +
+    geom_point(aes(size = p.value)) +
+  scale_size(trans = "log10", breaks = c(0.01, 0.1, 1)) +
+  theme_pubr() +
+  labs(x = "trait combination", y = "correlation") +
+  coord_flip() +
+  geom_hline(yintercept = 0, linetype = 2)
+
+```
