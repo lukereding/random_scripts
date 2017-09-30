@@ -49,12 +49,31 @@ df %>%
   group_by(project, day_start) %>%
   tally(sort = T) %>% 
   mutate(hours = n / 4) %>%
-  ggplot(aes(x = 1, y = hours)) +
+  ggplot(aes(x = day_start, y = hours)) +
   geom_col(position = "fill", aes(fill = project))+
   theme_minimal() +
-  facet_wrap(~day_start) +
-  scale_fill_manual(values = sample(cols)) +
-  labs(y = "proportion of time")
+  scale_fill_manual(values = cols) +
+  labs(y = "proportion of time", x = "date")
+ggsave("~/Desktop/time-track.jpg", width = 20, height = 13, units = "cm")
+
+# or 
+df %>%
+  mutate(start = date - 900,
+         end = date) %>%
+  mutate(start_formated = start %>% as.POSIXct(origin = "1970-01-01",tz = "GMT") %>% format(format="%Y-%m-%d"),
+         end_formated = end %>% as.POSIXct(origin = "1970-01-01",tz = "GMT") %>% format(format="%Y-%m-%d")) %>%
+  mutate(day_start = lubridate::date(start_formated),
+         day_end = lubridate::date(end_formated)) %>%
+  filter(! is.na(project)) %>%
+  group_by(project, day_start) %>%
+  tally(sort = T) %>% 
+  mutate(hours = n / 4) %>%
+  ggplot(aes(x = day_start, y = hours, group = project, color = project)) +
+  geom_line(size = 1.1) +
+  scale_color_manual(values = sample(cols))
+
+
+  
 
 
 ## hours worked  

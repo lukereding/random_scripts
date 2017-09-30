@@ -11,13 +11,52 @@ require(tidyverse)
 require(viridis)
 require(RColorBrewer)
 
+# for exploratory data analysis
+
+plot_histograms <- function(data){
+  data %>%
+    select_if(is.numeric) %>%
+    gather(variable, value) %>%
+    ggplot(aes(x = value)) +
+    geom_histogram() +
+    facet_wrap(~variable, scale = "free")+
+    theme_minimal()
+}
+
+plot_counts <- function(data){
+  data %>%
+    select_if(function(x) is.factor(x) || is.character(x)) %>%
+    gather(variable, value) %>%
+    ggplot(aes(x = value)) +
+    geom_bar() +
+    facet_wrap(~variable, scale = "free_x")+
+    theme_minimal()
+}
+
+plot_cat_relationship <- function(data, categorical_variable) {
+
+  numeric_cols <- names(data)[map_lgl(data, is.numeric)]
+  enquo_cat <- enquo(categorical_variable)
+
+  data %>%
+    select(!!enquo_cat, numeric_cols) %>%
+    gather(variable, value, -!!enquo_cat) %>%
+    ggplot(aes_string(x = quo_name(enquo_cat), y = "value", color = quo_name(enquo_cat))) +
+    geom_boxplot() +
+    facet_wrap(~variable, scales = "free") +
+    coord_flip() +
+    scale_color_brewer(type = "qual", palette = "Dark2", guide = F) +
+    ggtitle(paste0("relationships with ", quo_name(enquo_cat))) +
+    theme_minimal()
+}
+
 
 # theme for ggplot
 theme_mod <- function(font_size = 12, font_family = "", line_size = .5) {
   half_line <- 9
   small_rel <- 0.67
   small_size <- small_rel * font_size
-  
+
   theme_grey(base_size = font_size, base_family = font_family) %+replace%
     theme(
       rect              = element_rect(fill = "transparent", colour = NA, color = NA, size = 0, linetype = 0),
@@ -137,25 +176,37 @@ palette_pt <- function(n) {
 
   if (length(cols) < n)
     cols <- rep(cols, length.out = n)
-  
+
   cols[1:n]
-  
+
 }
 scale_color_pt <- function(...) discrete_scale("colour", "pt", palette_pt, ...)
 scale_fill_pt <- function(...) discrete_scale("fill", "pt", palette_pt, ...)
 
 
+palette_ds <- function(n) {
+  pal2 <- c("ECD078", "D95B43", "C02942", "542437", "53777A")
+  pal2 <- pal2[c(3,5,2,4,1)]
+
+  if (length(pal2) < n)
+    pal2 <- rep(pal2, length.out = n)
+
+  pal2[1:n]
+
+}
+scale_color_pt <- function(...) discrete_scale("colour", "ds", palette_ds, ...)
+scale_fill_pt <- function(...) discrete_scale("fill", "ds", palette_ds, ...)
 
 
 palette_lr <- function(n) {
   cols <- c("#FFBC00", "#FF7B35", "#FF5555", "#C55981", "#8E6DA2", "#525D6B", "#2E3838", "grey50")
   cols <- cols[c(3,6,2,7,4,1,8,5)]
-  
+
   if (length(cols) < n)
     cols <- rep(cols, length.out = n)
-  
+
   cols[1:n]
-  
+
 }
 scale_color_lr <- function(...) discrete_scale("colour", "lr", palette_lr, ...)
 scale_fill_lr <- function(...) discrete_scale("fill", "lr", palette_lr, ...)
@@ -170,12 +221,12 @@ palette_ras <- function(n, random_order = FALSE) {
   cols <- cols[c(2,4,1,3,5)]
   if (isTRUE(random_order))
     cols <- sample(cols)
-  
+
   if (length(cols) < n)
     cols <- rep(cols, length.out = n)
-  
+
   cols[1:n]
-  
+
 }
 scale_color_ras <- function(...) discrete_scale("colour", "ras", palette_ras, ...)
 scale_fill_ras <- function(...) discrete_scale("fill", "ras", palette_ras, ...)
@@ -204,12 +255,12 @@ palette_powder <- function(n, random_order = FALSE) {
             "#ebd4cb")
   if (isTRUE(random_order))
     cols <- sample(cols)
-  
+
   if (length(cols) < n)
     cols <- rep(cols, length.out = n)
-  
+
   cols[1:n]
-  
+
 }
 scale_color_powder <- function(...) discrete_scale("colour", "powder", palette_powder, ...)
 scale_fill_powder <- function(...) discrete_scale("fill", "powder", palette_powder, ...)
@@ -219,12 +270,12 @@ palette_classic <- function(n, random_order = FALSE) {
   cols <- c("#eaab00", "#004165","#236d01", "#eacb77", "#4686aa", "#65aa46" ,"#ea5d00", "#f29354")
   if (isTRUE(random_order))
     cols <- sample(cols)
-  
+
   if (length(cols) < n)
     cols <- rep(cols, length.out = n)
-  
+
   cols[1:n]
-  
+
 }
 scale_color_classic <- function(...) discrete_scale("colour", "classic", palette_classic, ...)
 scale_fill_classic <- function(...) discrete_scale("fill", "classic", palette_classic, ...)
@@ -234,12 +285,12 @@ palette_cool<- function(n, random_order = FALSE) {
   cols <- c("#1F1B29", "#00D6B1", "#339EFF", "#FFFB39", "#FD4A2E")
   if (isTRUE(random_order))
     cols <- sample(cols)
-  
+
   if (length(cols) < n)
     cols <- rep(cols, length.out = n)
-  
+
   cols[1:n]
-  
+
 }
 scale_color_cool <- function(...) discrete_scale("colour", "cool", palette_cool, ...)
 scale_fill_cool<- function(...) discrete_scale("fill", "cool", palette_cool, ...)
@@ -257,15 +308,15 @@ palette_base <- function(n, random_order = FALSE) {
             "#8f5536",
             "black")
   cols <- cols[c(1,6,5,2,7,4,8,3)]
-  
+
   if (isTRUE(random_order))
     cols <- sample(cols)
-  
+
   if (length(cols) < n)
     cols <- rep(cols, length.out = n)
-  
+
   cols[1:n]
-  
+
 }
 scale_color_base<- function(...) discrete_scale("colour", "base", palette_base, ...)
 scale_fill_base <- function(...) discrete_scale("fill", "base", palette_base, ...)
@@ -274,15 +325,15 @@ scale_fill_base <- function(...) discrete_scale("fill", "base", palette_base, ..
 palette_charted <- function(n, random_order = FALSE) {
   cols2 <- c('#6DCC73', '#1D7775', '#4FCFD5', '#FCE651', '#FF7050', '#FFC050', '#999999')
   cols2 <- cols2[c(1,2,3,5,6,7,4)]
-  
+
   if (isTRUE(random_order))
     cols2 <- sample(cols2)
-  
+
   if (length(cols2) < n)
     cols2 <- rep(cols2, length.out = n)
-  
+
   cols2[1:n]
-  
+
 }
 scale_color_charted<- function(...) discrete_scale("colour", "charted", palette_charted, ...)
 scale_fill_charted <- function(...) discrete_scale("fill", "charted", palette_charted, ...)
@@ -407,12 +458,12 @@ palette_cb <- function(n, random_order = FALSE) {
   cols <- cols[c(3,2,5,1,4,6:12)]
   if (isTRUE(random_order))
     cols <- sample(cols)
-  
+
   if (length(cols) < n)
     cols <- rep(cols, length.out = n)
-  
+
   cols[1:n]
-  
+
 }
 scale_color_cb<- function(...) discrete_scale("colour", "cb", palette_cb, ...)
 scale_fill_cb <- function(...) discrete_scale("fill", "cb", palette_cb, ...)
@@ -420,7 +471,7 @@ scale_fill_cb <- function(...) discrete_scale("fill", "cb", palette_cb, ...)
 
 
 ####################
-# continuous 
+# continuous
 
 g <- c(0.8423298817793848, 0.8737404427964184, 0.7524954030731037,
        0.7161563289278935, 0.8232880086631527, 0.6542005475652726,
@@ -438,7 +489,7 @@ for(i in seq(1, length(g), by = 3)){
   greens <- greens %>% c(rgb(g[i], g[1+i], g[2+i]))
 }
 greens <- colorRampPalette(greens)
-scale_color_greens <- function (..., alpha = 1, begin = 0, end = 1, direction = 1) 
+scale_color_greens <- function (..., alpha = 1, begin = 0, end = 1, direction = 1)
 {
   if (direction == -1) {
     tmp <- begin
@@ -461,7 +512,7 @@ for(i in seq(1, length(b), by = 3)){
 }
 gb <- colorRampPalette(gb)
 # create scale
-scale_color_gb <- function (..., alpha = 1, begin = 0, end = 1, direction = 1) 
+scale_color_gb <- function (..., alpha = 1, begin = 0, end = 1, direction = 1)
 {
   if (direction == -1) {
     tmp <- begin
@@ -485,7 +536,7 @@ for(i in seq(1, length(p), by = 3)){
   purples <- purples %>% c(rgb(p[i], p[1+i], p[2+i]))
 }
 purples <- colorRampPalette(purples)
-scale_color_purples <- function (..., alpha = 1, begin = 0, end = 1, direction = 1) 
+scale_color_purples <- function (..., alpha = 1, begin = 0, end = 1, direction = 1)
 {
   if (direction == -1) {
     tmp <- begin
@@ -498,7 +549,7 @@ scale_color_purples <- function (..., alpha = 1, begin = 0, end = 1, direction =
 
 b <- c("#2A2A38", "#53395C", "#793E6E", "#A24169", "#C24456", "#E34C30", "#E47C61", "#E19F91", "#DAC2BE", "#D8DAD7", "#D2F8EF")
 br <- colorRampPalette(b)
-scale_color_brrr <- function (..., alpha = 1, begin = 0, end = 1, direction = 1) 
+scale_color_brrr <- function (..., alpha = 1, begin = 0, end = 1, direction = 1)
 {
   if (direction == -1) {
     tmp <- begin
@@ -509,13 +560,13 @@ scale_color_brrr <- function (..., alpha = 1, begin = 0, end = 1, direction = 1)
 }
 #ggthemr::colour_plot(br(12))
 
-coord_radar <- function (theta = "x", start = 0, direction = 1) 
+coord_radar <- function (theta = "x", start = 0, direction = 1)
 {
   theta <- match.arg(theta, c("x", "y"))
-  r <- if (theta == "x") 
+  r <- if (theta == "x")
     "y"
   else "x"
-  ggproto("CordRadar", CoordPolar, theta = theta, r = r, start = start, 
+  ggproto("CordRadar", CoordPolar, theta = theta, r = r, start = start,
           direction = sign(direction),
           is_linear = function(coord) TRUE)
 }
