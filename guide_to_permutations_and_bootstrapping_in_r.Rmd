@@ -1,0 +1,265 @@
+---
+title: "permutation testing in the tidyverse"
+author: "Luke Reding"
+date: "10/4/2017"
+output: html_document
+---
+
+## why permutation testing
+
+## basic idea
+
+## some recipes for common use cases
+
+```{r}
+
+library(tidyverse)
+library(modelr)
+library(broom)
+
+```
+
+### bootstrapping
+
+Let's say we want to bootstrap a confidence interval for the relatiosnip between a car's weight and mpg:
+
+```{r}
+
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point() +
+  theme_minimal()
+
+
+```
+
+We can run a linear model and add the model predictions to the plot easily with `modelr` functions:
+
+```{r}
+
+mod <- lm(mpg ~ wt, data = mtcars)
+
+mtcars %>%
+  add_predictions(mod) %>%
+  ggplot(aes(x = wt, y = mpg)) +
+  geom_point() +
+  geom_line(aes(y = pred), color = "red") +
+  theme_minimal()
+
+```
+
+
+Now we can bootstrap out dataset--i.e., sampling the rows from the dataset with replacement--to get a sense of the confidence in our prediction in the regression. I do this using the `bootstap` function from `modelr` (though there is also a function by this name in the `broom` package, which is why I use the `::` notation below):
+
+```{r}
+
+library(purrr)
+
+resampled <-  mtcars %>%
+  modelr::bootstrap(100) %>%
+  mutate(models = map(strap, ~ lm(mpg ~ wt, data = .)))
+
+head(resampled)
+```
+
+The above code is a bit complex but very powerful. `modelr::bootstrap(100)` creates 100 different bootstrap replicates of the dataset. Each resampling gets in own row in the resulting dataframe in the column that is named `strap`.
+
+From there, we use the powerhouse combination of `mutate` with `map`. This is a common series of functions when working with dataframes in which some of the columns are lists (as the `strap` column is). The combination allows us to go into each of the lists, in this case in the `strap` column, and perform some function or extract some statistic we care about. `mutate` adds a column to the dataframe while `map` allows up to apply the operation to all the rows without having to use a loop.
+
+The call to `map` from within `mutate` is pretty typical: `map(strap, ~ lm(mpg ~ wt, data = .)`. The first argument, `strap` is the column that we want to pull something out of, or do something with. The second argument is a function; in this case the function is creating a linear model. The output of the linear model--which is, again, a list--will be saved to a new column called `models`.
+
+The `broom` package easily lets us extract usful things (fits, p-values, estimates of parameters) from model objects like the linear models we created and saved to the `models` column:
+
+```{r}
+
+resampled_with_stats <- resampled %>% 
+  mutate(tidy= map(models, broom::glance)) %>%
+  unnest(tidy)
+
+head(resampled_with_stats)
+
+```
+
+By applying `glance` to each of the models then `unnest`ing the list-column, we have a nice dataframe with the r squared value, p-value, etc for each model, which we can then easily plot:
+
+```{r}
+
+resampled_with_stats %>% 
+  ggplot(aes(x = r.squared)) +
+  geom_histogram() +
+  geom_density() +
+  theme_minimal()
+  
+```
+
+
+We can also plot all the regressions on our original plot. This requires a slightly different approach, since `modelr::bootstrap` stores a pointer to the bootstrapped dataframes and not the actual dataframe:
+
+```{r}
+
+mtcars %>%
+  broom::bootstrap(100) %>%
+  do(augment(lm(mpg ~ wt, data = .), .)) %>%
+  ggplot(aes(x = wt, y = mpg)) +
+  geom_line(aes(y = .fitted, group = replicate), color = "red", alpha = 0.1) +
+    geom_point() +
+  theme_minimal()
+
+```
+
+### correlation
+
+For a correlation, we might be interested in two different things:
+
+(1) Bootstrapping a confidence interval around our estimate of the correlation coefficient or 
+
+(2) Determining whether a non-zero correlation exists using permutation testing.
+
+I cover each below.
+
+
+#### :: bootstrapping a confidence interval
+
+This largely follows the appraoch we took above:
+
+
+```{r}
+
+mtcars %>% 
+  broom::bootstrap(100) %>%
+  do(glance(cor.test(.$wt, .$mpg))) %>% 
+  pull(estimate) %>%
+  quantile(., probs = c(0.025, 0.975))
+
+
+```
+
+That's the 95% confidence interval for the correlation coefficient. We can also plot the distribution of correlation coefficient:
+
+```{r}
+
+mtcars %>% 
+  broom::bootstrap(100) %>%
+  do(glance(cor.test(.$wt, .$mpg))) %>%
+  ggplot(aes(estimate)) +
+  geom_histogram() +
+  theme_minimal()
+
+
+```
+
+#### :: hypothesis testing with permutations
+
+(Note that I can't get this to work with `cor.test` so I'm using `lm` instead):
+
+```{r}
+
+permuted <- mtcars %>%
+  modelr::permute(100, mpg) %>%
+  mutate(models = map(perm, ~ lm(mpg ~ wt, data = .))) %>%
+  mutate(tidy = map(models, broom::glance)) %>% 
+  unnest(tidy)
+
+head(permuted)
+
+```
+
+We can not check to make sure that the randomization has destroyed any corrleation that was initially apparent:
+
+
+```{r}
+
+permuted %>%
+  ggplot(aes(x = statistic)) +
+  geom_histogram() +
+  geom_density() +
+  theme_minimal()
+
+```
+
+And that the p-values are roughly uniform:
+
+```{r}
+
+permuted %>%
+  ggplot(aes(x = p.value)) +
+  geom_histogram() +
+  geom_density() +
+  theme_minimal()
+
+```
+
+From this, we can get a permutation-based p-value:
+
+
+```{r}
+
+mod <- lm(mpg ~ wt, mtcars)
+
+(mean(permuted$statistic > broom::glance(mod)$statistic) + 1) / 100
+
+```
+
+As expected (the correlation is strong) this gives us a low p-value (actually, this is the lowest p-value we could get by running 100 replicates).
+
+```{r}
+
+cor.test(mtcars$mpg, mtcars$wt)
+
+```
+
+
+### regression
+
+
+### t-tests
+
+```{r}
+
+mtcars %>%
+  ggplot(aes(x = factor(am), y = wt)) +
+  geom_boxplot() +
+  theme_minimal()
+
+```
+
+Use a t-test just to get a sense of things:
+
+```{r}
+
+t.test(wt ~ factor(am), data = mtcars)
+
+```
+
+
+Do the permuting. Get the difference between the two groups instead of running t-test
+
+```{r}
+
+# number of permutations
+n <- 999
+
+permuted <- mtcars %>%
+  mutate(am = factor(am)) %>%
+  modelr::permute(n, am) %>%
+  mutate(models = map(perm, ~ t.test(wt ~ am, data = .))) %>%
+  mutate(tidy = map(models, broom::glance)) %>% 
+  unnest(tidy) 
+
+observed <- broom::glance(t.test(wt ~ factor(am), data = mtcars))$estimate
+
+ggplot(permuted, aes(x = estimate)) +
+  geom_histogram() +
+  geom_vline(xintercept = observed, color = "red") +
+  theme_minimal()
+
+mean(permuted$estimate) # around 0, as expected
+
+mod <- t.test(wt ~ factor(am), data = mtcars)
+
+(sum(abs(permuted$estimate) > ifelse(observed > 0, observed, -observed)) + 1) / (n+1)
+
+
+```
+
+### ANOVA
+
