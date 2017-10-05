@@ -5,7 +5,28 @@ date: "10/4/2017"
 output: html_document
 ---
 
-## why permutation testing
+## to do
+- figure out the influence of unequal sample sizes
+
+
+## why? and some definitions
+
+**bootstrapping**: sampling _with replacement_ from your data. Mostly useful for getting a confidence interval or seeing the variation inherent some test statistic of interest.
+
+**permutation testing:** creating all possible permutations of your data, calcualating some test statistic each time to generate a null distribution of test statistics, and comparing the observed results to this distribution. Because permutation testing is often not feasible for larger datasets, I stop talking about it here.
+
+**monte carlo sampling:** Similar to permutation testing, but uses random or psudo-random numbers to randomly permute the dataset to generate a null distribution and compare the distribution to the observed test statistic.
+
+This document really only covers 'modern' methods of bootstrapping and monte carlo sampling.
+
+#### advantages:
+- makes few assumptions, espeically about the form of the distribution from which the data are draw (e.g. normally distributed)
+- p-values are intuitve to calculate and understand
+- seems like magic
+
+#### disadvantages:
+- p-values can change when you re-reun the analysis (but can change less if you increase the number of times you permute the dataset)
+- fewer resources on running permutation tests / less entrenched in the culture of hypothesis testing
 
 ## basic idea
 
@@ -94,7 +115,7 @@ resampled_with_stats %>%
 
 We can also plot all the regressions on our original plot. This requires a slightly different approach, since `modelr::bootstrap` stores a pointer to the bootstrapped dataframes and not the actual dataframe:
 
-```{r}
+```{r warning=FALSE}
 
 mtcars %>%
   broom::bootstrap(100) %>%
@@ -129,7 +150,6 @@ mtcars %>%
   do(glance(cor.test(.$wt, .$mpg))) %>% 
   pull(estimate) %>%
   quantile(., probs = c(0.025, 0.975))
-
 
 ```
 
@@ -263,3 +283,150 @@ mod <- t.test(wt ~ factor(am), data = mtcars)
 
 ### ANOVA
 
+```{r}
+
+# normal way
+
+model <- aov(mpg ~ factor(cyl), data = mtcars)
+summary(model)
+aov(model)
+
+require(magrittr)
+broom::augment(model) %>%
+  ggplot(aes(x = .resid)) +
+  geom_histogram(aes(fill = factor.cyl.)) +
+  ggtitle("histogram of residuals") +
+  theme_minimal()
+
+
+```
+
+
+Choose test statistic: between group SSs. This will be large is there's a big effect of the cateogrical variable.
+
+
+```{r}
+
+get_ss <- function(model) {
+  anova(model)$`Sum Sq`[1]
+}
+
+permuted <- mtcars %>%
+  mutate(cyl = factor(cyl)) %>%
+  modelr::permute(999, cyl) %>%
+  mutate(models = map(perm, ~ aov(mpg ~ cyl, data = .))) %>%
+  mutate(tidy = map(models, broom::glance)) %>% 
+  mutate(between_group_ss = map_dbl(models, get_ss)) %>%
+  unnest(tidy) 
+
+head(permuted)
+
+```
+
+```{r}
+# get actual between group SS
+observed_ss <- anova(model)$`Sum Sq`[1]
+
+# plot null distribution
+ggplot(permuted, aes(x = between_group_ss)) +
+  geom_histogram() +
+  geom_vline(xintercept = observed_ss, color = "red") +
+  theme_minimal()
+
+```
+
+We could also encapsulate all of this in a function:
+
+
+```{r}
+# code goes here!
+```
+
+## unequal variance
+
+Resampling methods for t-tests and ANOVA randomize the labels associated with the observations, so that actually assume equal variance among the groups.
+
+
+
+
+
+
+
+
+-------------------------
+**The following is not true, but I'm including it because it took a lot of work!:**
+
+(That said, I think this is a fine way to bootstrap a confidence interval of differences in means between groups.)
+
+According to Good (_Resampling Methods: A practical guide to data analysis_), one way around this assumption of equal variance is to bootstrap the differences in means between the groups, bootstrapping _within_ each group then taking the difference of the means. If the observed differences are not just due to chance, we'd expect the 95% CI of the bootstrapped means to exclude the observed difference.
+
+Importantly, you must sample based on the null hypothesis that there is no average difference in the means between the groups. 
+
+```{r}
+
+bootstrap_within_groups <- function(df, group, variable, replicates = 999, seed = NULL) {
+  group_enquo <- enquo(group)
+  variable_enquo <- enquo(variable)
+  
+  group_vector <- pull(df, !!group_enquo)
+  variable_vector <- pull(df, !!variable_enquo)
+  
+  # subtract the mean of mpg from each group to simulate under H0 that there's no difference between the groups
+  variable_vector <- variable_vector - ave(variable_vector, group_vector)
+  
+  
+  # make sure there are only two groups
+  stopifnot(length(levels(factor(group_vector))) == 2)
+  
+  get_diff <- function(var, grp) {
+    split(var, grp) %>% 
+      map(sample, replace = T) %>%
+      map(mean) %>%
+      unlist %>%
+      Reduce(`-`, .)
+  }
+  
+  if(!is.null(seed)) set.seed(seed)
+  out <- replicate(replicates, get_diff(variable_vector, group_vector))
+  
+  data.frame(replicate = 1:replicates, mean_diff = out)
+  
+}
+
+# define number of samples to draw 
+n <- 9999
+
+# get the observed difference
+observed <- mtcars %>% split(.$am) %>% map(~ mean(.$mpg)) %>% unlist %>% Reduce(`-`, .)
+
+booted <- mtcars %>% 
+  nest %>%
+  mutate(rep = map(data, 
+                         bootstrap_within_groups, 
+                         group = am, 
+                         variable = mpg, 
+                         replicates = n, 
+                         seed = 10)) %>%
+  unnest(rep) 
+
+p <- (sum(abs(booted$mean_diff) > ifelse(observed > 0, observed, -observed)) + 1) / (n+1)
+
+booted %>%
+  ggplot(aes(x= mean_diff)) +
+  geom_histogram() +
+  geom_vline(xintercept = observed, color = "red") +
+  theme_minimal() +
+  ggtitle("null distribution and observed differences between groups", 
+          subtitle = paste0("p = ", p))
+  
+
+```
+
+
+We can compare that to a t-test:
+
+```{r}
+
+t.test(mpg ~ am, data = mtcars)
+
+```
