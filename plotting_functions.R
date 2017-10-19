@@ -175,6 +175,7 @@ move_ticks_inside_x <- function(){theme(axis.ticks.length=unit(-0.25, "cm"), axi
 move_ticks_inside_y <- function(){theme(axis.ticks.length=unit(-0.25, "cm"), axis.text.y = element_text(margin=margin(10,10,15,5,"pt")))}
 # theme_set(theme_mod())
 
+
 ## add themes from https://github.com/kassambara/ggpubr/blob/master/R/theme_pubr.R
 theme_pubr <- function (base_size = 12, base_family = "",
                         border = FALSE, margin = TRUE,
@@ -246,6 +247,20 @@ labs_pubr <- function(base_size = 14, base_family = ""){
 
 ## discrete
 
+palette_warm <- function(n) {
+  cols <- c("#722E95", "#FD397B", "#FF6678", "#FE9C5D", "#FFC102", "#FFD775", "#969698", "#4C4C4E", "#D1C1DB", "#9A6CB5")
+  cols <- cols[c(3, 5, 8, 1, 4, 6, 9, 7, 2, 10)]
+  
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_warm <- function(...) discrete_scale("colour", "warm", palette_warm, ...)
+scale_fill_warm <- function(...) discrete_scale("fill", "warm", palette_warm, ...)
+
+
 palette_pt <- function(n) {
   cols <- c("#44AAAA", "#AA4455", "#4477AA", "#AA4488", "#44AA77", "#AA7744", "#AAAA44")
 
@@ -260,7 +275,7 @@ scale_fill_pt <- function(...) discrete_scale("fill", "pt", palette_pt, ...)
 
 
 palette_ds <- function(n) {
-  pal2 <- c("ECD078", "D95B43", "C02942", "542437", "53777A")
+  pal2 <- c("#ECD078", "#D95B43", "#C02942", "#542437", "#53777A")
   pal2 <- pal2[c(3,5,2,4,1)]
 
   if (length(pal2) < n)
@@ -269,8 +284,8 @@ palette_ds <- function(n) {
   pal2[1:n]
 
 }
-scale_color_pt <- function(...) discrete_scale("colour", "ds", palette_ds, ...)
-scale_fill_pt <- function(...) discrete_scale("fill", "ds", palette_ds, ...)
+scale_color_ds <- function(...) discrete_scale("colour", "ds", palette_ds, ...)
+scale_fill_ds <- function(...) discrete_scale("fill", "ds", palette_ds, ...)
 
 
 palette_lr <- function(n) {

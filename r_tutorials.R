@@ -1,3 +1,19 @@
+## using padr
+
+require(tidyverse); require(padr)
+
+dehydration_day <- emergency %>% 
+  filter(title == 'Traffic: VEHICLE ACCIDENT -') %>% 
+  thicken(interval = 'day') %>% 
+  group_by(time_stamp_day) %>% 
+  summarise(nr = n()) %>% 
+  pad() %>% 
+  fill_by_value(nr)
+
+ggplot(dehydration_day, aes(time_stamp_day, nr)) +
+  geom_point() +
+  geom_smooth(se = F)
+
 
 ### making surface plots with R
 
