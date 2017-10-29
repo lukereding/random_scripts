@@ -246,6 +246,19 @@ labs_pubr <- function(base_size = 14, base_family = ""){
 #########################
 
 ## discrete
+palette_carto <- function(n) {
+  cols <- c('#5F4690','#1D6996','#38A6A5','#0F8554','#73AF48','#EDAD08','#E17C05','#CC503E','#94346E','#6F4070','#994E95','#666666')
+  cols <- cols[c(2,3,6,7,8,9,1,4,5,10)]
+  if (length(cols) < n)
+    cols <- rep(cols, length.out = n)
+  
+  cols[1:n]
+  
+}
+scale_color_carto <- function(...) discrete_scale("colour", "carto", palette_carto, ...)
+scale_fill_carto <- function(...) discrete_scale("fill", "carto", palette_carto, ...)
+
+
 
 palette_warm <- function(n) {
   cols <- c("#722E95", "#FD397B", "#FF6678", "#FE9C5D", "#FFC102", "#FFD775", "#969698", "#4C4C4E", "#D1C1DB", "#9A6CB5")
