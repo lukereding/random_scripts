@@ -81,7 +81,16 @@ r_to_d <- function(r = NULL) {
 }
 
 
-
+# change the background color of a plot
+with_background <- function(plot, fill = "white", color = "NA") {
+  if(class(plot)[1] != "gg") {
+    stop("is `plot` a ggplot2 plot?")
+  }
+  
+  plot + theme(plot.background = element_rect(fill = fill, colour = color), 
+               panel.background = element_rect(fill = fill, colour = color))
+  
+}
 
 
 
@@ -122,6 +131,8 @@ plot_cat_relationship <- function(data, categorical_variable) {
     ggtitle(paste0("relationships with ", quo_name(enquo_cat))) +
     theme_minimal()
 }
+
+ 
 
 # theme for ggplot
 theme_mod <- function(font_size = 12, font_family = "", line_size = .5) {
