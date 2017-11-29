@@ -1,3 +1,52 @@
+## using widyr
+## devtools::install_github('dgrtwo/widyr')
+
+# used for some r functions, like cor.test and t.test, that like data in wide format
+
+# suppose we want to use the gapminder dataset and calcualte the correlation between 
+# life expectancies between all countries. Let's first look at how we'd do it for one country pair:
+
+# x <- gapminder %>% filter(country  == "Albania") %>% pull(lifeExp)
+# y <- gapminder %>% filter(country  == "Afghanistan") %>% pull(lifeExp)
+# cor(x,y)
+# [1] 0.9656953
+
+# we can use `tidyr` to change the data to long format, but widyr provides a nicer solution
+
+gapminder %>%
+pairwise_cor(country, year, lifeExp)
+
+# let's step through the arguments:
+## country: we want to compare each country to every other country
+## year: above, we correlated x and y to find the correlation between `lifeExp` in Albania and Afghanistan.
+## Imagine what the plot of this correlation looks like. What does each point represent? It represents a different year.
+## So this arugment represents what each data point represents.
+## lifeExp: this is the value that you're actually comparing
+
+# We really only want the correlation between Albania and Afghanistan, but this gives us Albania/Afghanistan and Afghanistan/ Albania.
+# instead we can use:
+
+gapminder %>%
+  pairwise_cor(country, year, lifeExp, upper = FALSE, sort = TRUE)
+
+# This also sorts according to the highest correlation
+
+# unfortunately, widyr doesn't have a similar function for t-tests. For the I recommend this approahc:
+
+as_tibble(mtcars) %>%
+  rownames_to_column %>%
+  nest(-cyl) %>%
+  mutate(test = map(data, ~ cor.test(.$disp, .$mpg)), results = map(test, glance)) %>%
+  unnest(results)
+
+
+as_tibble(mtcars) %>%
+  mutate(vs = factor(vs)) %>%
+  rownames_to_column %>%
+  nest(-cyl) %>%
+  mutate(test = map(data, ~ t.test(wt ~ vs, data = .)), results = map(test, glance)) %>%
+  unnest(results)
+
 ## using padr
 
 require(tidyverse); require(padr)
