@@ -140,7 +140,7 @@ I cover each below.
 
 #### :: bootstrapping a confidence interval
 
-This largely follows the appraoch we took above:
+This largely follows the approach we took above:
 
 
 ```{r}
