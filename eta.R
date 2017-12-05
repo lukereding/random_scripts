@@ -9,6 +9,8 @@ find_type <- function(x) {
 
 eda <- function(x) {
   require("GoodmanKruskal")
+  
+  x <- as.data.frame(x)
 
   num_rows <- ncol(x)^2 - ncol(x)
   df <- tibble(var1 = vector(mode = "character", length = 1),
@@ -24,7 +26,7 @@ eda <- function(x) {
         # get type of columns i and j
         var_1_type <- find_type(x[,i])
         var_2_type <- find_type(x[,j])
-        #print(paste("var1 type: ", var_1_type, "\nvar2 type: ", var_2_type, "\n\n"))
+        print(paste("var1 type: ", var_1_type, "\nvar2 type: ", var_2_type, "\n\n"))
         
         if(var_1_type == "numeric" & var_2_type == "numeric") {
           # run a correlation
@@ -40,25 +42,27 @@ eda <- function(x) {
         } else if(var_1_type == "factor" & var_2_type == "numeric") {
           # run an ANOVA or t-test, depending on number of levels
           num_levels <- length(levels(x[,i]))
-          result <- aov(x[,j] ~ x[,i])
+          require(ICC)
+          result <- ICCest(names(x)[i], names(x)[j], data = x)$ICC
           df <- add_row(df, 
                         var1 = names(x)[i],
                         var2 = names(x)[j],
-                        statistic = "F",
-                        value = summary(result) %>% map("F value") %>% unlist %>% .[1],
-                        p_value = summary(result) %>% map("Pr(>F)") %>% unlist %>% .[1],
+                        statistic = "ICC",
+                        value = result,
+                        p_value = NA_real_,
                         n = NA_integer_
           )
         } else if(var_1_type == "numeric" & var_2_type == "factor") {
           # run an ANOVA or t-test, depending on number of levels
           num_levels <- length(levels(x[,j]))
-          result <- aov(x[,i] ~ x[,j])
+          require(ICC)
+          result <- ICCest(names(x)[j], names(x)[i], data = x)$ICC
           df <- add_row(df, 
                         var1 = names(x)[i],
                         var2 = names(x)[j],
-                        statistic = "F",
-                        value = summary(result) %>% map("F value") %>% unlist %>% .[1],
-                        p_value = summary(result) %>% map("Pr(>F)") %>% unlist %>% .[1],
+                        statistic = "ICC",
+                        value = result,
+                        p_value = NA_real_,
                         n = NA_integer_
           )
         } else if(var_1_type == "factor" & var_2_type == "factor") {
@@ -92,11 +96,12 @@ iris$interval <- cut(iris$Sepal.Length, 4)
 
 eda(iris)
 
-eda(Orange) %>% 
-  unite(variables, var1, var2) %>%
-  ggplot(aes(y = abs(value), x = variables)) +
+eda(df) %>% 
+  unite(variables, var1, var2, sep = " :: ") %>%
+  ggplot(aes(y = abs(value), x = reorder(variables, value))) +
   geom_point() +
   coord_flip() +
   facet_wrap(~statistic, scales = "free") +
   theme_minimal()
+ggsave("~/Desktop/out.pdf", width = 20, height = 10)
 
