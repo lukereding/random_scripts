@@ -7,8 +7,11 @@ find_type <- function(x) {
   )
 }
 
+# to do:
+## remove for NAs
+## get p-values
+
 eda <- function(x) {
-  require("GoodmanKruskal")
   
   x <- as.data.frame(x)
 
@@ -26,7 +29,7 @@ eda <- function(x) {
         # get type of columns i and j
         var_1_type <- find_type(x[,i])
         var_2_type <- find_type(x[,j])
-        print(paste("var1 type: ", var_1_type, "\nvar2 type: ", var_2_type, "\n\n"))
+        #print(paste("var1 type: ", var_1_type, "\nvar2 type: ", var_2_type, "\n\n"))
         
         if(var_1_type == "numeric" & var_2_type == "numeric") {
           # run a correlation
@@ -66,6 +69,7 @@ eda <- function(x) {
                         n = NA_integer_
           )
         } else if(var_1_type == "factor" & var_2_type == "factor") {
+          require("GoodmanKruskal")
             # compute the GKtau statistic
           stat <- GKtau(x[,i], x[,j])$tauxy
           df <- add_row(df, 
@@ -89,7 +93,7 @@ eda <- function(x) {
           }
       }
     }
-  arrange(df[-1,], desc(p_value))
+  arrange(df[-1,], p_value)
 }
 
 iris$interval <- cut(iris$Sepal.Length, 4)
@@ -97,11 +101,12 @@ iris$interval <- cut(iris$Sepal.Length, 4)
 eda(iris)
 
 eda(df) %>% 
+  filter(!is.na(value)) %>%
   unite(variables, var1, var2, sep = " :: ") %>%
-  ggplot(aes(y = abs(value), x = reorder(variables, value))) +
+  ggplot(aes(y = value, x = reorder(variables, value))) +
   geom_point() +
   coord_flip() +
   facet_wrap(~statistic, scales = "free") +
   theme_minimal()
-ggsave("~/Desktop/out.pdf", width = 20, height = 10)
+ggsave("~/Desktop/out.pdf", width = 20, height = 15)
 
