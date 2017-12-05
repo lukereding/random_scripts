@@ -119,15 +119,15 @@ eda <- function(x) {
   df[-1,]
 }
 
-eda(iris)
-
-eda(iris) %>% 
-  filter(!is.na(value)) %>%
-  unite(variables, var1, var2, sep = " :: ") %>%
-  ggplot(aes(y = value, x = reorder(variables, value))) +
-  geom_point() +
-  coord_flip() +
-  facet_wrap(~statistic, scales = "free") +
-  theme_minimal()
+# eda(iris)
+# 
+# eda(iris) %>% 
+#   filter(!is.na(value)) %>%
+#   unite(variables, var1, var2, sep = " :: ") %>%
+#   ggplot(aes(y = value, x = reorder(variables, value))) +
+#   geom_point() +
+#   coord_flip() +
+#   facet_wrap(~statistic, scales = "free") +
+#   theme_minimal()
 # ggsave("~/Desktop/out.pdf", width = 20, height = 15)
 
