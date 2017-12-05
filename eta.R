@@ -9,7 +9,7 @@ find_type <- function(x) {
 
 eda <- function(x) {
   require("GoodmanKruskal")
-  
+
   num_rows <- ncol(x)^2 - ncol(x)
   df <- tibble(var1 = vector(mode = "character", length = 1),
                var2 = vector(mode = "character", length = 1),
@@ -18,19 +18,20 @@ eda <- function(x) {
                p_value = vector(mode = "double", length = 1),
                n = vector(mode = "integer", length = 1))
   
-  for(i in seq_along(1:ncol(iris)))
-    for(j in seq_along(1:ncol(iris))) {
+  for(i in seq_along(1:ncol(x)))
+    for(j in seq_along(1:ncol(x))) {
       if(i != j){
         # get type of columns i and j
         var_1_type <- find_type(x[,i])
         var_2_type <- find_type(x[,j])
+        #print(paste("var1 type: ", var_1_type, "\nvar2 type: ", var_2_type, "\n\n"))
         
         if(var_1_type == "numeric" & var_2_type == "numeric") {
           # run a correlation
           result <- cor.test(x[,i], x[,j])
           df <- add_row(df, 
-                  var1 = names(x[i]),
-                  var2 = names(x[j]),
+                  var1 = names(x)[i],
+                  var2 = names(x)[j],
                   statistic = "r",
                   value = result$estimate,
                   p_value = result$p.value,
@@ -41,8 +42,8 @@ eda <- function(x) {
           num_levels <- length(levels(x[,i]))
           result <- aov(x[,j] ~ x[,i])
           df <- add_row(df, 
-                        var1 = names(x[i]),
-                        var2 = names(x[j]),
+                        var1 = names(x)[i],
+                        var2 = names(x)[j],
                         statistic = "F",
                         value = summary(result) %>% map("F value") %>% unlist %>% .[1],
                         p_value = summary(result) %>% map("Pr(>F)") %>% unlist %>% .[1],
@@ -53,8 +54,8 @@ eda <- function(x) {
           num_levels <- length(levels(x[,j]))
           result <- aov(x[,i] ~ x[,j])
           df <- add_row(df, 
-                        var1 = names(x[i]),
-                        var2 = names(x[j]),
+                        var1 = names(x)[i],
+                        var2 = names(x)[j],
                         statistic = "F",
                         value = summary(result) %>% map("F value") %>% unlist %>% .[1],
                         p_value = summary(result) %>% map("Pr(>F)") %>% unlist %>% .[1],
@@ -64,8 +65,8 @@ eda <- function(x) {
             # compute the GKtau statistic
           stat <- GKtau(x[,i], x[,j])$tauxy
           df <- add_row(df, 
-                        var1 = names(x[i]),
-                        var2 = names(x[j]),
+                        var1 = names(x)[i],
+                        var2 = names(x)[j],
                         statistic = "tau",
                         value = stat,
                         p_value = NA_real_,
@@ -74,8 +75,8 @@ eda <- function(x) {
         } else{
             # return an empty row
           df <- add_row(df, 
-                        var1 = names(iris[i]),
-                        var2 = names(iris[j]),
+                        var1 = names(x)[i],
+                        var2 = names(x)[j],
                         statistic = NA_character_,
                         value = NA_integer_,
                         p_value = NA_real_,
@@ -91,7 +92,7 @@ iris$interval <- cut(iris$Sepal.Length, 4)
 
 eda(iris)
 
-eda(iris) %>% 
+eda(Orange) %>% 
   unite(variables, var1, var2) %>%
   ggplot(aes(y = abs(value), x = variables)) +
   geom_point() +
