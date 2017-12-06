@@ -7,8 +7,17 @@ find_type <- function(x) {
   )
 }
 
+permute_icc <- function(x, y, n = 99) {
+  actual <- ICCbare(x, y)
+  nulls <- vector(length = length(n), mode = "numeric")
+  for(i in seq_along(1:n)) {
+    scrambled_x <- sample(x, length(x), replace = F)
+    nulls[i] <- ICCbare(scrambled_x, y)
+  }
+  (sum(abs(nulls) > ifelse(actual > 0, actual, -actual)) + 1) / (n+1)
+}
+
 # to do:
-## remove for NAs
 ## get p-values
 
 eda <- function(x) {
@@ -69,26 +78,28 @@ eda <- function(x) {
           # run an ANOVA or t-test, depending on number of levels
           num_levels <- length(levels(x1))
           require(ICC)
-          result <- ICCest(x1, x2)$ICC
+          result <- ICCbare(x1, x2)
+          p <- permute_icc(x1, x2)
           df <- add_row(df, 
                         var1 = names(x)[i],
                         var2 = names(x)[j],
                         statistic = "ICC",
                         value = result,
-                        p_value = NA_real_,
+                        p_value = p,
                         n = n
           )
         } else if(var_1_type == "numeric" & var_2_type == "factor") {
           # run an ANOVA or t-test, depending on number of levels
           num_levels <- length(levels(x2))
           require(ICC)
-          result <- ICCest(x2, x1)$ICC
+          result <- ICCbare(x2, x1)
+          p <- permute_icc(x2, x1)
           df <- add_row(df, 
                         var1 = names(x)[i],
                         var2 = names(x)[j],
                         statistic = "ICC",
                         value = result,
-                        p_value = NA_real_,
+                        p_value = p,
                         n = n
           )
         } else if(var_1_type == "factor" & var_2_type == "factor") {
@@ -121,10 +132,11 @@ eda <- function(x) {
 
 # eda(iris)
 # 
-# eda(iris) %>% 
+# eda(iris) %>%
 #   filter(!is.na(value)) %>%
 #   unite(variables, var1, var2, sep = " :: ") %>%
-#   ggplot(aes(y = value, x = reorder(variables, value))) +
+#   mutate(significant = if_else(p_value < 0.05, "significant", "NS")) %>%
+#   ggplot(aes(y = value, x = reorder(variables, value), color = significant)) +
 #   geom_point() +
 #   coord_flip() +
 #   facet_wrap(~statistic, scales = "free") +
