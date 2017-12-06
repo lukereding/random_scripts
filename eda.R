@@ -19,6 +19,7 @@ permute_icc <- function(x, y, n = 99) {
 
 permute_tau <- function(x, y, n = 99) {
   actual <- GKtau(x, y)$tauxy
+  nulls <- vector(length = length(n), mode = "numeric")
   for(i in seq_along(1:n)) {
     scrambled_x <- sample(x, length(x), replace = F)
     nulls[i] <- GKtau(scrambled_x, y)$tauxy
