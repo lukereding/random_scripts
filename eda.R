@@ -17,6 +17,15 @@ permute_icc <- function(x, y, n = 99) {
   (sum(abs(nulls) > ifelse(actual > 0, actual, -actual)) + 1) / (n+1)
 }
 
+permute_tau <- function(x, y, n = 99) {
+  actual <- GKtau(x, y)$tauxy
+  for(i in seq_along(1:n)) {
+    scrambled_x <- sample(x, length(x), replace = F)
+    nulls[i] <- GKtau(scrambled_x, y)$tauxy
+  }
+  (sum(abs(nulls) > ifelse(actual > 0, actual, -actual)) + 1) / (n+1)
+}
+
 # to do:
 ## get p-values
 
@@ -106,12 +115,13 @@ eda <- function(x) {
           require("GoodmanKruskal")
             # compute the GKtau statistic
           stat <- GKtau(x1, x2)$tauxy
+          p <- permute_tau(x1, x2)
           df <- add_row(df, 
                         var1 = names(x)[i],
                         var2 = names(x)[j],
                         statistic = "tau",
                         value = stat,
-                        p_value = NA_real_,
+                        p_value = p,
                         n = n
           )
         } else{
