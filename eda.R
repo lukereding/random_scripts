@@ -146,7 +146,8 @@ eda <- function(x, plot = FALSE) {
       geom_point() +
       coord_flip() +
       facet_wrap(~statistic, scales = "free") +
-      theme_minimal()
+      theme_minimal() +
+      scale_color_manual(values = c("#37454B", "#E84F22"))
   } else{
     df[-1,]
   }
