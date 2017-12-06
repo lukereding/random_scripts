@@ -29,7 +29,7 @@ permute_tau <- function(x, y, n = 99) {
 # to do:
 ## get p-values
 
-eda <- function(x) {
+eda <- function(x, plot = FALSE) {
   
   x <- as.data.frame(x)
 
@@ -137,7 +137,20 @@ eda <- function(x) {
           }
       }
     }
-  df[-1,]
+  if(plot == TRUE) {
+    df[-1,] %>%
+      filter(!is.na(value)) %>%
+      unite(variables, var1, var2, sep = " by ") %>%
+      mutate(`possibly significant` = if_else(p_value < 0.05, "significant", "NS")) %>%
+      ggplot(aes(y = value, x = reorder(variables, value), color = `possibly significant`)) +
+      geom_point() +
+      coord_flip() +
+      facet_wrap(~statistic, scales = "free") +
+      theme_minimal()
+  } else{
+    df[-1,]
+  }
+
 }
 
 # eda(iris)
