@@ -44,7 +44,7 @@ eda <- function(x, plot = FALSE) {
   
   for(i in seq_along(1:ncol(x)))
     for(j in seq_along(1:ncol(x))) {
-      if(i != j){
+      if(i < j){
         # get type of columns i and j
         var_1_type <- find_type(x[,i])
         var_2_type <- find_type(x[,j])
@@ -115,14 +115,24 @@ eda <- function(x, plot = FALSE) {
         } else if(var_1_type == "factor" & var_2_type == "factor") {
           require("GoodmanKruskal")
             # compute the GKtau statistic
-          stat <- GKtau(x1, x2)$tauxy
-          p <- permute_tau(x1, x2)
+          stat1 <- GKtau(x1, x2)$tauxy
+          stat2 <- GKtau(x1, x2)$tauyx
+          p1 <- permute_tau(x1, x2)
+          p2 <- permute_tau(x2, x1)
           df <- add_row(df, 
                         var1 = names(x)[i],
                         var2 = names(x)[j],
                         statistic = "tau",
-                        value = stat,
-                        p_value = p,
+                        value = stat1,
+                        p_value = p1,
+                        n = n
+          )
+          df <- add_row(df, 
+                        var1 = names(x)[j],
+                        var2 = names(x)[i],
+                        statistic = "tau",
+                        value = stat2,
+                        p_value = p2,
                         n = n
           )
         } else{
