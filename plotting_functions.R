@@ -197,6 +197,9 @@ move_ticks_inside_y <- function() {
 }
 # theme_set(theme_mod())
 
+make_background <- function(color = "black") {
+  theme(panel.background = element_rect(fill = color, colour = color)) + theme(plot.background = element_rect(fill = color, colour = color))
+}
 
 ## add themes from https://github.com/kassambara/ggpubr/blob/master/R/theme_pubr.R
 theme_pubr <- function(base_size = 12, base_family = "",
@@ -715,6 +718,18 @@ scale_color_purples <- function(..., alpha = 1, begin = 0, end = 1, direction = 
     end <- tmp
   }
   scale_color_gradientn(colours = purples(256), ...)
+}
+
+scale_color_reds <- function(...) {
+  require(colorspace)
+  cols <- heat_hcl(200, c = c(80, 30), l = c(30, 90), power = c(1/5, 2))
+  scale_color_gradientn(colours = cols, ...)
+}
+
+scale_fill_reds <- function(...) {
+  require(colorspace)
+  cols <- heat_hcl(200, c = c(80, 30), l = c(30, 90), power = c(1/5, 2))
+  scale_fill_gradientn(colours = cols, ...)
 }
 
 
