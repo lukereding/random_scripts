@@ -1,0 +1,173 @@
+---
+title: "Automated exploratory data analysis in R"
+output:
+  html_document:
+    df_print: paged
+---
+
+You want to listen to what your data tells you. But that can be hard when you have a lot of things (variables) you're keeping track of. If you measure 10 variables and are interested in what's happening in your dataset, you need to produce at least 10 choose 2 = 45 plots. That'll take some time. If there are 20 variables, creating 190 plots is in your future. But your outlook is improving with the code I'm sharing below.
+
+The goal of the `eda` function is to allow you to quickly get a sense of potential patterns in your dataset that you can then follow up on with a more thorough analysis. 
+
+## what it does
+
+The `eda` function computes some statistic of interest between every pair of columns in your dataframe. The statistic it computes depends on the nature of the variables:
+
+- We calculate the [_correlation coefficient_](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient) for two continuous variables. A correlation, or _r_, ranges from -1 to 1. Values near zero are rarely interesting.
+
+- [_Goodman and Kruskal’s tau_](https://cran.r-project.org/web/packages/GoodmanKruskal/vignettes/GoodmanKruskal.html) is calculated if the two variables are both categorical. It can range from 0 (not interesting) to 1 (interesting). 
+
+> Interestingly, tau is not symmetric: tau(x,y) is not necessarily the same as tau(y,x). Why? Think of the relationship between country and continent, two categorical variables. If I know the country, I know with 100% certaintly what continent it belongs to. So tau(country, continent) is 1. But if I'm only given the continent and had to predict the country, I'd have a harder time (except for Australia or Antarctica). So tau(continent, country) < 1, for the ability for continent to predict country is less than perfect.
+
+- Finally, for the relationship between a categorical and a continuous variable, we calculate the intraclass correlation coefficient, or [ICC](https://en.wikipedia.org/wiki/Intraclass_correlation). It ranges from 0 (not interesting) to 1 (interesting). 
+
+The `eda` function figures out the appropriate test to use for each pair of variables.
+
+## the input
+
+The input to the `eda` (which stands for 'exploratory data analysis', by the way) is a dataframe. The function assumes that each thing you care about, i.e., each variable, is in its own column. If not, you'll need to `gather` or `spread` with tools from the `tidyr` package. It also assumes that categorical variables are coded as factors in R. You can check this with the `is.factor` function. Character vectors are simply ignored.
+
+## the output 
+
+The output is also a dataframe. The dataframe has six columns:
+
+- var1: the first variable
+- var2: the second variable
+- statistic: what type of statistic was calculated (_r_, the ICC, or tau).
+- value: the value of the statistic
+- p_value: p-value for the relationship. Based on permutation tests with only 99 permutations for tau and ICC, so take a box of Morton's.
+- n: the number of observations. This might vary due to missingness in some columns. By default, missing values are removed.
+
+## let's try it out
+
+We can `source` the function, or load it so that R recognizes it, from the web:
+
+```{r}
+
+source("https://raw.githubusercontent.com/lukereding/random_scripts/master/eda.R")
+
+```
+
+If you try to use the function without installing the `tidyverse`, `GoodmanKruskal`, or `ICC` libraries, you will likely run into problems. If you don't have one of these libraries, use `install.packages` like `install.packages("ICC")`. If you aren't sure, you can see what `library("ICC")` returns or simply re-install the package.
+
+Let's see what this function returns on the fabled `iris` dataset:
+
+```{r}
+
+library(tidyverse)
+
+# make sure species is a factor
+iris$Species <- factor(iris$Species)
+
+eda(iris)
+
+```
+
+As promised, a dataframe with six columns. From here, it might be nice to make a plot so that we can visually see the more interesting relationships.
+
+You can produce a plot quickly by setting `plot = TRUE` in `eda`:
+
+
+```{r, fig.height = 7, fig.width = 10}
+
+eda(iris, plot = TRUE)
+
+```
+
+Or we can create it like this:
+
+```{r, fig.height = 7, fig.width = 10}
+
+eda(iris) %>%
+  unite(combo, var1, var2, sep = " by ") %>% # make a new column with the combination of both variables
+  mutate(`possibly significant` = if_else(p_value < 0.05, "significant", "NS")) %>%
+  ggplot(aes(x = reorder(combo, value), y = value, color = `possibly significant`)) +
+  geom_point() +
+  facet_wrap(~statistic, scales = "free") +
+  coord_flip() +
+  theme_minimal()
+
+```
+
+
+This plot is pretty informative. The ICC side of the plot contains relationships between categorcial and continuous variables, while the plot on the right contains relationships between continuous variables.
+
+One thing we see is that `Species` and `Petal.Length` have a high ICC. We can plot this relationship to verify this:
+
+
+```{r}
+
+iris %>%
+  ggplot(aes(x = Species, y = Petal.Length)) +
+  geom_jitter(width = 0.1) +
+  theme_minimal()
+
+```
+
+Petal length differs a lot between species and relatively little within a species, giving rise to the high ICC value.
+
+The relationship between `Sepal.Width` and `Species` is less strong; it looks like this:
+
+
+```{r}
+
+iris %>%
+  ggplot(aes(x = Species, y = Sepal.Width)) +
+  geom_jitter(width = 0.1) +
+  theme_minimal()
+
+
+```
+
+There's still some separatation here, but it's clear it's not as strong as the previous relationship. 
+
+### one more time
+
+Let's try a different dataset:
+
+```{r}
+
+x <- read_csv("http://datadryad.org/bitstream/handle/10255/dryad.154475/mating_success_allometry_2014.csv?sequence=1")
+
+head(x)
+
+```
+
+Make factors where necessary:
+
+
+```{r, fig.width = 10, fig.height = 8, warning=FALSE}
+
+x$sex <- factor(x$sex)
+x$month <- factor(x$month)
+x$`date tagged` <- factor(x$`date tagged`)
+
+
+# plot the result
+eda(x, plot = TRUE)
+
+```
+
+By can verify indiviual relationships by plotting them directly:
+
+
+```{r}
+
+x %>% 
+  ggplot(aes(x = sex, y = fl)) +
+  geom_jitter(width = 0.1) +
+  theme_minimal() +
+  ggtitle("sex by fl")
+
+```
+
+
+## caveats
+
+- complex experimental designs
+
+If your experimental design is complicated, a pretty simplicitic approach like this won't work.
+
+- trust but verify!
+
+Don't start penning your letter to Nature once you see something significant. This is really only meant to give you a sense of idea of interesting relationships. Use it to narrow down your search, then exhausively test the most interesting relationships directly.
