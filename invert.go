@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	_ "image/jpeg"
 	"image/png"
 	"math"
 	"os"
@@ -44,8 +43,9 @@ func main() {
 
 	// parse arguments
 	filename := flag.String("i", "test.png", "path to the image")
-	invertGray := flag.String("invert_grey", "yes", "do you only want to invert grey pixels? default: yes")
-	invertNonGrey := flag.String("invert_color", "yes", "do you only want invert non-grey pixels? default: yes")
+	invertGray := flag.String("invert_grey", "yes", "do you only want to invert grey pixels?")
+	invertNonGrey := flag.String("invert_color", "yes", "do you only want invert non-grey pixels?")
+	outputFileName := flag.String("o", "out", "output filename.")
 	flag.Parse()
 
 	// only_grey := *nonGrayOnly
@@ -114,14 +114,14 @@ func main() {
 	} // end y for
 
 	// save the result to a new image
-	outputFile, err := os.Create("out.png")
+	fmt.Println(*outputFileName)
+	outputFile, err := os.Create(*outputFileName + ".png")
 	if err != nil {
 		panic(err.Error())
 	}
 
-	// write as a png
-	png.Encode(outputFile, newImage)
+	defer outputFile.Close()
 
-	outputFile.Close()
+	png.Encode(outputFile, newImage)
 
 }
