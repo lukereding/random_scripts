@@ -16,6 +16,7 @@ import (
 	"image/png"
 	"math"
 	"os"
+	"path/filepath"
 )
 
 // flips a value around 128 to get the 'inverse' color
@@ -45,7 +46,6 @@ func main() {
 	filename := flag.String("i", "test.png", "path to the image")
 	invertGray := flag.String("invert_grey", "yes", "do you only want to invert grey pixels?")
 	invertNonGrey := flag.String("invert_color", "yes", "do you only want invert non-grey pixels?")
-	outputFileName := flag.String("o", "out", "output filename.")
 	flag.Parse()
 
 	// only_grey := *nonGrayOnly
@@ -114,12 +114,19 @@ func main() {
 	} // end y for
 
 	// save the result to a new image
-	fmt.Println(*outputFileName)
-	outputFile, err := os.Create(*outputFileName + ".png")
+
+	// find basename
+	fileBasename := filepath.Base(*filename)
+	// strip extension
+	fileExtention := filepath.Ext(*filename)
+	outputFileName := fileBasename + "_inverted" + fileExtention
+
+	fmt.Println(outputFileName)
+
+	outputFile, err := os.Create(outputFileName)
 	if err != nil {
 		panic(err.Error())
 	}
-
 	defer outputFile.Close()
 
 	png.Encode(outputFile, newImage)
