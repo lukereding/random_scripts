@@ -1,5 +1,6 @@
 import re
 import sys
+import os
 
 '''
 
@@ -106,7 +107,7 @@ def write_largest_match(header, all_transcript_file):
                 output_file.write(line)
                 line = next(lines)
                 while re.match(r'^[ATGCN]+\n$', line) is not None:
-                    print(line)
+                    # print(line)
                     output_file.write(line)
                     line = next(lines)
                 else:
@@ -118,10 +119,15 @@ def write_largest_match(header, all_transcript_file):
                 line = next(lines)
         except:
             break
+def rename_output_if_exists():
+    if os.path.isfile('./output.txt'):
+        os.rename('./output.txt', './output.bkp')
 
 if __name__ == "__main__":
 
     transcripts_file = sys.argv[1]
+
+    rename_output_if_exists()
 
     # write the largest transcipt to the output file
     save_single_copy_transcipts(transcripts_file)
@@ -132,7 +138,7 @@ if __name__ == "__main__":
     for transcript_number, headers in loci_header_dict.items():
         largest_matches.append(find_largest_match(headers))
 
-    print(largest_matches)
+    # print(largest_matches)
 
     for header in largest_matches:
         write_largest_match(header, transcripts_file)
