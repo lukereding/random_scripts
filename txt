@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import plivo
+import os
+import sys
+
+# get environmental variables
+auth_id = os.getenv("PLIVO_ID")
+auth_token = os.getenv("PLIVO_TOKEN")
+plivo_number = os.getenv("plivo_number")
+
+# get the body of the text
+text_body = ""
+
+for token in sys.argv[1:]:
+    text_body += str(token) + " "
+
+# send it
+client = plivo.RestClient(auth_id=auth_id, auth_token=auth_token)
+message_created = client.messages.create(
+    src = plivo_number,
+    dst = '12406788175',
+    text = text_body
+)
