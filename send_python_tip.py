@@ -2,6 +2,8 @@ import re
 import subprocess
 from datetime import datetime
 from os.path import expanduser
+import time
+import os
 
 from random import sample
 
@@ -35,7 +37,7 @@ def send_email(body):
 
 def bash_command(cmd):
     x = subprocess.Popen(['/bin/bash', '-c', cmd])
-    _ = x.wait()
+    time.sleep(1)
 
 def get_start_pages(file):
     # only used initially to extract the start pages for the recipes from the table of contents
@@ -347,4 +349,3 @@ if __name__ == "__main__":
     text = get_plaintext(pdf, start = recipe[0][0], stop = recipe[0][1])
 
     send_email(text)
-    
