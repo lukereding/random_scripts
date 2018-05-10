@@ -50,8 +50,8 @@ def get_start_pages(file):
         lines = f.readlines()
         for line in lines:
             if re.match(regex, line):
-                # pdb.set_trace()
-                start_pages = start_pages + [int(line.strip())]
+                # page 1 in the book is page 19 of the pdf
+                start_pages = start_pages + [int(line.strip()) + 18]
 
     end_pages = start_pages[1:]
     # we don't know when the last recipe ends
